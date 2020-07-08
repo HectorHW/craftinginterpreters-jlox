@@ -74,9 +74,13 @@ public class Scanner {
                 if(match('/')) {
                 while(peek()!='\n' && !isAtEnd()) advance(); //пропустим оставшуюся часть строки
             }else if(match('*')){ // /*
-                    while (peek()!='*' || peekNext()!='/'){ // */
+                    while ((peek()!='*' || peekNext()!='/') && !isAtEnd()){ // */
                         if(peek()=='\n') line++;
                         advance();
+                    }
+                    if(isAtEnd()) {
+                        Lox.error(line, "Unterminated multiline comment.");
+                        return;
                     }
                     advance(); advance();
                 }
