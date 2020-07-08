@@ -51,17 +51,28 @@ public class Lox {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
+        System.out.println(tokens);
 
-        //пока что просто выведем токены
-        for(var token : tokens){
-            System.out.println(token);
-        }
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
+
+        if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
+
+        System.out.println(new AstPrinter().print(expression));
     }
 
 
     //сообщения об ошибках
     static void error(int line, String message){
         report(line, "", message);
+    }
+
+    static void error(Token token, String message){
+        if(token.type == TokenType.EOF){
+            report(token.line, " at end", message);
+        }else{
+            report(token.line, " at '"+token.lexeme+"'", message);
+        }
     }
 
     private static void report(int line, String where, String message){

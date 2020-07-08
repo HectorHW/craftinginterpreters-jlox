@@ -4,6 +4,7 @@ public enum TokenType {
     //односимвольные
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    QUESTION, COLON,
 
     //одно- или двусимвольные
     BANG, BANG_EQUAL,

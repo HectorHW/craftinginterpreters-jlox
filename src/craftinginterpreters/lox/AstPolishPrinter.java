@@ -13,6 +13,12 @@ public class AstPolishPrinter implements Expr.Visitor<String>{
     }
 
     @Override
+    public String visitTernaryExpr(Expr.Ternary expr) {
+        return expr.left.accept(this) + " " + expr.middle.accept(this)+
+            " " + expr.right.accept(this) + expr.op1+expr.op2;
+    }
+
+    @Override
     public String visitGroupingExpr(Expr.Grouping expr) {
         return expr.expression.accept(this);
     }
