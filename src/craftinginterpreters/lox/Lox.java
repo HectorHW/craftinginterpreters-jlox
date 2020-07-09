@@ -10,7 +10,10 @@ import java.util.List;
 
 public class Lox {
 
+    private static final Interpreter interpreter = new Interpreter();
+
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
 
     public static void main(String[] args) throws IOException {
         //у нас есть два варианта использования интерпретатора:
@@ -33,6 +36,7 @@ public class Lox {
         run(new String(bytes, Charset.defaultCharset()));
         //проверим на наличие ошибок, при их возникновении прекратим исполнение
         if(hadError) System.exit(65);
+        if(hadRuntimeError) System.exit(70);
     }
 
     private static void runPrompt() throws IOException {
@@ -51,14 +55,16 @@ public class Lox {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        System.out.println(tokens);
+        //System.out.println(tokens);
 
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
 
         if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
 
-        System.out.println(new AstPrinter().print(expression));
+        //System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(expression);
+
     }
 
 
@@ -78,6 +84,11 @@ public class Lox {
     private static void report(int line, String where, String message){
         System.out.printf("[line %d] Error %s: %s\n", line, where, message);
         hadError = true;
+    }
+
+    static void runtimeError(RuntimeError error){
+        System.out.printf("%s\n[line %d]\n", error.getMessage(), error.token.line);
+        hadRuntimeError = true;
     }
 
 }
