@@ -16,6 +16,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         }
     }
 
+    String interpret(Expr expr){
+        return stringify(expr.accept(this));
+    }
+
 
 
     @Override

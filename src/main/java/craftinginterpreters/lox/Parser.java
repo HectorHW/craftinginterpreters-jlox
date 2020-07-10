@@ -6,7 +6,7 @@ import java.util.List;
 import static craftinginterpreters.lox.TokenType.*;
 
 public class Parser {
-    private static class ParseError extends RuntimeException{}
+    static class ParseError extends RuntimeException{}
     private final List<Token> tokens;
     private int current = 0;
 
@@ -20,6 +20,10 @@ public class Parser {
             statements.add(declaration());
         }
         return statements;
+    }
+
+    Expr parseAsExpression(){
+        return expression();
     }
 
     private Expr expression(){

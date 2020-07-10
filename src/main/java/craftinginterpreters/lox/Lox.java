@@ -47,7 +47,12 @@ public class Lox {
             System.out.print("> ");
             var line = reader.readLine();
             if(line==null) break; //выход по Ctrl + D
-            run(line);
+            if(line.endsWith(";")){
+                run(line);
+            }else{
+                runAsREPLExpression(line);
+            }
+
             hadError = false; //мы не хотим, чтобы ошибки завершали программу REPL
         }
     }
@@ -64,6 +69,25 @@ public class Lox {
 
         //System.out.println(new AstPrinter().print(expression));
         interpreter.interpret(statements);
+
+    }
+
+    private static void runAsREPLExpression(String source){
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.scanTokens();
+        //System.out.println(tokens);
+
+        Parser parser = new Parser(tokens);
+        try{
+            Expr ex = parser.parseAsExpression();
+            if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
+            String result = interpreter.interpret(ex);
+            System.out.println(result);
+        }catch (Parser.ParseError ignored){
+
+        }catch (RuntimeError e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
