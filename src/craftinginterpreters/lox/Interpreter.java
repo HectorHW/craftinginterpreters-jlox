@@ -100,6 +100,9 @@ public class Interpreter implements Expr.Visitor<Object>{
             case BANG_EQUAL: return !isEqual(left, right);
             case EQUAL_EQUAL: return isEqual(left, right);
 
+            case COMMA:
+                return right;
+
         }
 
 
