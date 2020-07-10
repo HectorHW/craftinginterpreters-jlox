@@ -11,6 +11,7 @@ abstract class Expr {
     R visitLiteralExpr(Literal expr);
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
+    R visitParameterlessInteractorExpr(ParameterlessInteractor expr);
   }
   static class Assign extends Expr {
     Assign(Token name, Expr value) {
@@ -102,6 +103,17 @@ abstract class Expr {
     @Override
     <R> R accept(Visitor<R> visitor) {
     return visitor.visitVariableExpr(this);
+    }
+    final Token name;
+  }
+  static class ParameterlessInteractor extends Expr {
+    ParameterlessInteractor(Token name) {
+      this.name = name;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+    return visitor.visitParameterlessInteractorExpr(this);
     }
     final Token name;
   }

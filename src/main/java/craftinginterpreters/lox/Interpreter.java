@@ -162,6 +162,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         return environment.get(expr.name);
     }
 
+    @Override
+    public Object visitParameterlessInteractorExpr(Expr.ParameterlessInteractor expr) {
+        switch (expr.name.type) {
+            case READLINE -> {
+                var scanner = new java.util.Scanner(System.in);
+                return scanner.nextLine();
+            }
+            case READNUM -> {
+                var scanner = new java.util.Scanner(System.in);
+                return scanner.nextDouble();
+            }
+            default -> throw new RuntimeError(expr.name, "Unknown parameterless");
+        }
+
+    }
+
     private Object evaluate(Expr expr){
         return expr.accept(this);
     }

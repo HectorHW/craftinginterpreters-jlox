@@ -24,7 +24,8 @@ public class GenerateAst {
             "Grouping : Expr expression",
             "Literal : Object value",
             "Unary : Token operator, Expr right",
-            "Variable : Token name"
+            "Variable : Token name",
+            "ParameterlessInteractor : Token name"
         ));
 
         defineAst(outputDir, "Stmt", Arrays.asList(

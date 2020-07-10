@@ -44,6 +44,11 @@ public class AstPolishPrinter implements Expr.Visitor<String>{
         return expr.name.lexeme;
     }
 
+    @Override
+    public String visitParameterlessInteractorExpr(Expr.ParameterlessInteractor expr) {
+        return "(" + expr.name.lexeme + ")";
+    }
+
     public static void main(String[] args) {
         // 1 + 2 * 3
         var expr = new Expr.Binary(
