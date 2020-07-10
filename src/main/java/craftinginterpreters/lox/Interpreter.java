@@ -1,5 +1,6 @@
 package craftinginterpreters.lox;
 
+import java.util.InputMismatchException;
 import java.util.List;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
@@ -171,7 +172,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             }
             case READNUM -> {
                 var scanner = new java.util.Scanner(System.in);
-                return scanner.nextDouble();
+                try{
+                    return scanner.nextDouble();
+                }catch (InputMismatchException e){
+                    throw new RuntimeError(expr.name, "failed to read number with readnum.");
+                }
+
             }
             default -> throw new RuntimeError(expr.name, "Unknown parameterless");
         }
