@@ -64,10 +64,13 @@ public class Scanner {
             case '}' -> addToken(RIGHT_BRACE);
             case ',' -> addToken(COMMA);
             case '.' -> addToken(DOT);
-            case '-' -> addToken(MINUS);
-            case '+' -> addToken(PLUS);
+            //case '-' -> addToken(MINUS);
+            case '-' -> addToken(match('=') ? MINUS_EQUAL : MINUS);
+            //case '+' -> addToken(PLUS);
+            case '+' -> addToken(match('=') ? PLUS_EQUAL : PLUS);
             case ';' -> addToken(SEMICOLON);
-            case '*' -> addToken(STAR);
+            //case '*' -> addToken(STAR);
+            case '*' -> addToken(match('=') ? STAR_EQUAL : STAR);
 
             case '?' -> addToken(QUESTION);
             case ':' -> addToken(COLON);
@@ -92,7 +95,8 @@ public class Scanner {
                     advance(); advance();
                 }
                 else{
-                addToken(SLASH);
+                //addToken(SLASH);
+                addToken(match('=') ? SLASH_EQUAL : SLASH);
             } }
 
             case ' ', '\t', '\r' -> {}

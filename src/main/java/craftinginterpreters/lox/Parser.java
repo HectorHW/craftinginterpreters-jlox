@@ -172,6 +172,36 @@ public class Parser {
             }
 
             error(equals, "Invalid assignment target.");
+        }else if(match(PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)){
+            Token equals = previous();
+            Expr value = assignment();
+
+            if(expr instanceof Expr.Variable){
+                Token name = ((Expr.Variable)expr).name;
+                //превращаем a+=... в a = a + ...
+                var shorthand = switch (equals.type){
+                    case PLUS_EQUAL -> new Expr.Binary(
+                        new Expr.Variable(name), new Token(
+                        PLUS, "+", null, name.line
+                    ), value);
+                    case MINUS_EQUAL -> new Expr.Binary(
+                        new Expr.Variable(name), new Token(
+                        MINUS, "-", null, name.line
+                    ), value);
+                    case STAR_EQUAL -> new Expr.Binary(
+                        new Expr.Variable(name), new Token(
+                        STAR, "*", null, name.line
+                    ), value);
+                    case SLASH_EQUAL -> new Expr.Binary(
+                        new Expr.Variable(name), new Token(
+                        SLASH, "/", null, name.line
+                    ), value);
+                    default -> null;
+                };
+                return new Expr.Assign(name, shorthand);
+            }
+
+            error(equals, "Invalid assignment target.");
         }
         return expr;
     }
