@@ -37,6 +37,7 @@ public class Scanner {
         keywords.put("while",  WHILE);
         keywords.put("readline", READLINE);
         keywords.put("readnum", READNUM);
+        keywords.put("break", BREAK);
     }
 
 

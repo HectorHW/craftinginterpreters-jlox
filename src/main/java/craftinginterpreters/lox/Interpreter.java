@@ -4,7 +4,8 @@ import java.util.InputMismatchException;
 import java.util.List;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
-
+    static class LoxInterpreterControlException extends RuntimeException{} //хак, позволяющий не определять throws
+    static class BreakLoopException extends LoxInterpreterControlException{};
     private Environment environment = new Environment();
 
     void interpret(List<Stmt> statements){
@@ -260,9 +261,22 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Void visitWhileStmt(Stmt.While stmt){
         while(isTruthy(evaluate(stmt.condition))){
-            execute(stmt.body);
+            try{
+                execute(stmt.body);
+            }catch (BreakLoopException e){
+                break;
+            }
+
         }
         return null;
+    }
+
+    @Override
+    public Void visitControlStatementStmt(Stmt.ControlStatement stmt)  {
+        switch (stmt.parameter.type){
+            case BREAK -> throw new BreakLoopException();
+            default -> {return null;}
+        }
     }
 
     @Override

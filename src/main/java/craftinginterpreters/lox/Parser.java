@@ -10,6 +10,7 @@ public class Parser {
     static class ParseError extends RuntimeException{}
     private final List<Token> tokens;
     private int current = 0;
+    private boolean inLoop = false;
 
     Parser(List<Token> tokens){
         this.tokens = tokens;
@@ -53,6 +54,7 @@ public class Parser {
         if(match(IF)) return ifStatement();
         if(match(WHILE)) return whileStatement();
         if(match(FOR)) return forStatement();
+        if (match(BREAK)) return loopcontrolStatement();
         return expressionStatement();
     }
 
@@ -85,7 +87,9 @@ public class Parser {
         consume(LEFT_PAREN, "Expected `(` after while.");
         Expr condition = expression();
         consume(RIGHT_PAREN, "Expected `)` after while condition.");
+        inLoop = true;
         Stmt body = statement();
+        inLoop = false;
         return new Stmt.While(condition, body);
     }
 
@@ -111,7 +115,9 @@ public class Parser {
             increment = expression();
         }
         consume(RIGHT_PAREN, "Expected `)` after for clauses");
+        inLoop = true;
         Stmt body = statement();
+        inLoop = false;
         if(increment!=null){ //добавляем операцию инкремента в конец блока
             body = new Stmt.Block(Arrays.asList(
                 body, new Stmt.Expression(increment)
@@ -123,6 +129,13 @@ public class Parser {
             body = new Stmt.Block(Arrays.asList(initializer, body));
         }
         return body;
+    }
+
+    private Stmt loopcontrolStatement(){
+        if(!inLoop) throw error(previous(), "loop control statement outside of loop.");
+        var statement = new Stmt.ControlStatement(previous());
+        consume(SEMICOLON, "Expected `;` after loop control statement.");
+        return statement;
     }
 
     private List<Stmt> block(){

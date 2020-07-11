@@ -10,6 +10,7 @@ abstract class Stmt {
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
+    R visitControlStatementStmt(ControlStatement stmt);
   }
   static class Block extends Stmt {
     Block(List<Stmt> statements) {
@@ -84,6 +85,17 @@ abstract class Stmt {
     }
     final Expr condition;
     final Stmt body;
+  }
+  static class ControlStatement extends Stmt {
+    ControlStatement(Token parameter) {
+      this.parameter = parameter;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+    return visitor.visitControlStatementStmt(this);
+    }
+    final Token parameter;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
