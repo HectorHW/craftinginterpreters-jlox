@@ -93,7 +93,7 @@ public class Parser {
         return new Stmt.While(condition, body);
     }
 
-    private Stmt forStatement(){ //for - всего лишь синтаксический сахар над while
+    private Stmt forStatement(){ //в нашем случае for - немного другой вид цикла
         consume(LEFT_PAREN, "Expected `(` after for.");
         Stmt initializer;
         if(match(SEMICOLON)){ //for (;
@@ -107,7 +107,10 @@ public class Parser {
         Expr condition = null;
         if(!check(SEMICOLON)){ //for(..;<cond>;
             condition = expression();
-        }//else for(..;;
+        }else{
+            condition = new Expr.Literal(true);
+            //else for(..;;
+        }
         consume(SEMICOLON, "Expected `;` after loop condition.");
 
         Expr increment = null;
@@ -118,6 +121,7 @@ public class Parser {
         inLoop = true;
         Stmt body = statement();
         inLoop = false;
+        /*
         if(increment!=null){ //добавляем операцию инкремента в конец блока
             body = new Stmt.Block(Arrays.asList(
                 body, new Stmt.Expression(increment)
@@ -129,6 +133,8 @@ public class Parser {
             body = new Stmt.Block(Arrays.asList(initializer, body));
         }
         return body;
+         */
+        return new Stmt.For(initializer, condition, body, increment);
     }
 
     private Stmt loopcontrolStatement(){

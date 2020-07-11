@@ -272,6 +272,23 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
     @Override
+    public Void visitForStmt(Stmt.For stmt) {
+        if(stmt.init!=null)
+            execute(stmt.init);
+
+        while(isTruthy(evaluate(stmt.condition))){
+            try{
+                execute(stmt.body);
+            }catch (BreakLoopException e){
+                break;
+            }
+            if(stmt.increment!=null)
+                evaluate(stmt.increment);
+        }
+        return null;
+    }
+
+    @Override
     public Void visitControlStatementStmt(Stmt.ControlStatement stmt)  {
         switch (stmt.parameter.type){
             case BREAK -> throw new BreakLoopException();

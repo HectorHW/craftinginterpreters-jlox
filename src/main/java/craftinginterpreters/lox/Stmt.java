@@ -10,6 +10,7 @@ abstract class Stmt {
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
     R visitWhileStmt(While stmt);
+    R visitForStmt(For stmt);
     R visitControlStatementStmt(ControlStatement stmt);
   }
   static class Block extends Stmt {
@@ -85,6 +86,23 @@ abstract class Stmt {
     }
     final Expr condition;
     final Stmt body;
+  }
+  static class For extends Stmt {
+    For(Stmt init, Expr condition, Stmt body, Expr increment) {
+      this.init = init;
+      this.condition = condition;
+      this.body = body;
+      this.increment = increment;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+    return visitor.visitForStmt(this);
+    }
+    final Stmt init;
+    final Expr condition;
+    final Stmt body;
+    final Expr increment;
   }
   static class ControlStatement extends Stmt {
     ControlStatement(Token parameter) {
