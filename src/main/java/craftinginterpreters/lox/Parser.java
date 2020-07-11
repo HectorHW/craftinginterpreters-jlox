@@ -84,9 +84,15 @@ public class Parser {
     }
 
     private Stmt whileStatement(){
-        consume(LEFT_PAREN, "Expected `(` after while.");
-        Expr condition = expression();
-        consume(RIGHT_PAREN, "Expected `)` after while condition.");
+        Expr condition;
+        if(match(LEFT_PAREN)){
+            //consume(LEFT_PAREN, "Expected `(` after while.");
+            condition = expression();
+            consume(RIGHT_PAREN, "Expected `)` after while condition.");
+        }else{
+            condition = new Expr.Literal(true);
+        }
+
         inLoop = true;
         Stmt body = statement();
         inLoop = false;
