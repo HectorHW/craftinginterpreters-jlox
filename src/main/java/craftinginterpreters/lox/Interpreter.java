@@ -6,6 +6,7 @@ import java.util.List;
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     static class LoxInterpreterControlException extends RuntimeException{} //хак, позволяющий не определять throws
     static class BreakLoopException extends LoxInterpreterControlException{};
+    static class ContinueLoopException extends LoxInterpreterControlException{};
     private Environment environment = new Environment();
 
     void interpret(List<Stmt> statements){
@@ -265,7 +266,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 execute(stmt.body);
             }catch (BreakLoopException e){
                 break;
-            }
+            }catch (ContinueLoopException ignored){}
 
         }
         return null;
@@ -281,8 +282,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 execute(stmt.body);
             }catch (BreakLoopException e){
                 break;
-            }
-            if(stmt.increment!=null)
+            }catch (ContinueLoopException ignored){}
+            if(stmt.increment!=null) //исполняем инкремент даже если мы использовали continue
                 evaluate(stmt.increment);
         }
         return null;
@@ -292,6 +293,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     public Void visitControlStatementStmt(Stmt.ControlStatement stmt)  {
         switch (stmt.parameter.type){
             case BREAK -> throw new BreakLoopException();
+            case CONTINUE -> throw new ContinueLoopException();
             default -> {return null;}
         }
     }

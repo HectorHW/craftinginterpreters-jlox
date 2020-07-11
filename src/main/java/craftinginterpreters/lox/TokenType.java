@@ -18,7 +18,7 @@ public enum TokenType {
     //зарезервированные ключевые слова
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
-    BREAK,
+    BREAK, CONTINUE,
 
     EOF,
     //для полноценной работы добавим способ чтения пользовательского ввода

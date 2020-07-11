@@ -54,7 +54,7 @@ public class Parser {
         if(match(IF)) return ifStatement();
         if(match(WHILE)) return whileStatement();
         if(match(FOR)) return forStatement();
-        if (match(BREAK)) return loopcontrolStatement();
+        if (match(BREAK, CONTINUE)) return loopcontrolStatement();
         return expressionStatement();
     }
 
