@@ -2,6 +2,7 @@ package craftinginterpreters.lox;
 
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Scanner;
 
 public class LoxPredefined {
     static void bake(Interpreter interpreter){
@@ -56,8 +57,10 @@ public class LoxPredefined {
 
     static void defineReadnum(Environment env){
         env.define("readnum", (LoxMacro) (interpreter) -> {
-            var scanner = new java.util.Scanner(System.in);
             try{
+                Scanner scanner =
+                    (Scanner) interpreter.globals.values.getOrDefault("+StdInScanner+", new Scanner(System.in));
+                interpreter.globals.values.put("+StdInScanner+", scanner);
                 return scanner.nextDouble();
             }catch (InputMismatchException e){
                 throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readnum", null, -1),
@@ -69,8 +72,11 @@ public class LoxPredefined {
 
     static void defineReadline(Environment env){
         env.define("readline", (LoxMacro) (interpreter) -> {
-            var scanner = new java.util.Scanner(System.in);
-            return scanner.nextLine();
+            Scanner scanner =
+                (Scanner) interpreter.globals.values.getOrDefault("+StdInScanner+", new Scanner(System.in));
+            String input = scanner.nextLine();
+            interpreter.globals.values.put("+StdInScanner+", scanner);
+            return input;
         });
     }
 
