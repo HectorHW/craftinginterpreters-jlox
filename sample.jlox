@@ -1,0 +1,8 @@
+macro r {
+var a = readnum;
+var b = readnum;
+return a+b;
+}
+
+print r;
+
