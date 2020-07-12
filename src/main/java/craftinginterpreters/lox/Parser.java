@@ -44,6 +44,7 @@ public class Parser {
                 return function("function");
             }
             if(match(VAR)) return varDeclaration();
+            if(match(MACRO)) return macroDeclaration();
             return statement();
         }catch (ParseError error){
             synchronize();
@@ -250,6 +251,13 @@ public class Parser {
         }
         consume(SEMICOLON, "Expected `;` after variable declaration.");
         return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt macroDeclaration(){
+        Token name = consume(IDENTIFIER, "Expected macro name.");
+        consume(LEFT_BRACE, "Expected `{` before macro body.");
+        List<Stmt> body = block();
+        return new Stmt.Macro(name, body);
     }
 
 

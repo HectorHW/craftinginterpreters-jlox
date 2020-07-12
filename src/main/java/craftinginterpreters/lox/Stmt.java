@@ -9,6 +9,7 @@ abstract class Stmt {
     R visitIfStmt(If stmt);
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
+    R visitMacroStmt(Macro stmt);
     R visitWhileStmt(While stmt);
     R visitForStmt(For stmt);
     R visitControlStatementStmt(ControlStatement stmt);
@@ -75,6 +76,19 @@ abstract class Stmt {
     }
     final Token name;
     final Expr initializer;
+  }
+  static class Macro extends Stmt {
+    Macro(Token name, List<Stmt> body) {
+      this.name = name;
+      this.body = body;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+    return visitor.visitMacroStmt(this);
+    }
+    final Token name;
+    final List<Stmt> body;
   }
   static class While extends Stmt {
     While(Expr condition, Stmt body) {

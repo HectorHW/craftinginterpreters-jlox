@@ -24,5 +24,5 @@ public enum TokenType {
     EOF,
     //для полноценной работы добавим способ чтения пользовательского ввода
     //READNUM, READLINE
-
+    MACRO
 }

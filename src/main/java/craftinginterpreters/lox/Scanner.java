@@ -39,6 +39,7 @@ public class Scanner {
         //keywords.put("readnum", READNUM);
         keywords.put("break", BREAK);
         keywords.put("continue", CONTINUE);
+        keywords.put("macro", MACRO);
     }
 
 

@@ -360,6 +360,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
     @Override
+    public Void visitMacroStmt(Stmt.Macro stmt) {
+        LoxMacro macro = new LoxMacro() {
+            Environment env = environment;
+            @Override
+            public Object call(Interpreter interpreter) {
+                try{
+                    executeBlock(stmt.body, env);
+                }catch (Return r){
+                    return r.value;
+                }
+                return null;
+            }
+        };
+        environment.define(stmt.name.lexeme, macro);
+        return null;
+
+    }
+
+    @Override
     public Object visitAssignExpr(Expr.Assign expr){
         Object value = evaluate(expr.value);
         environment.assign(expr.name, value);

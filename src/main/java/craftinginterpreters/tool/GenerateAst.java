@@ -36,6 +36,7 @@ public class GenerateAst {
             "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "Print : Expr expression",
             "Var : Token name, Expr initializer",
+            "Macro : Token name, List<Stmt> body",
             "While : Expr condition, Stmt body",
             "For : Stmt init, Expr condition, Stmt body, Expr increment",
             "ControlStatement : Token parameter",
