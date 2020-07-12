@@ -33,7 +33,7 @@ public class LoxFunction implements LoxCallable {
 
     @Override
     public String toString(){
-        if(declaration.name.lexeme!=null){
+        if(declaration.name!=null){
             return "<fn "+declaration.name.lexeme+">";
         }else{
             return "<anon function>";
