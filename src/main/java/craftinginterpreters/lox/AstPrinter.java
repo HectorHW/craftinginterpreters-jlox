@@ -48,10 +48,6 @@ public class AstPrinter implements Expr.Visitor<String>{
         return expr.name.lexeme;
     }
 
-    @Override
-    public String visitParameterlessInteractorExpr(Expr.ParameterlessInteractor expr) {
-        return "(" + expr.name.lexeme + ")";
-    }
 
     @Override
     public String visitCallExpr(Expr.Call expr) {

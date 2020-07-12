@@ -35,8 +35,8 @@ public class Scanner {
         keywords.put("true",   TRUE);
         keywords.put("var",    VAR);
         keywords.put("while",  WHILE);
-        keywords.put("readline", READLINE);
-        keywords.put("readnum", READNUM);
+        //keywords.put("readline", READLINE);
+        //keywords.put("readnum", READNUM);
         keywords.put("break", BREAK);
         keywords.put("continue", CONTINUE);
     }
