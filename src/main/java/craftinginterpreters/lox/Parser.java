@@ -1,7 +1,6 @@
 package craftinginterpreters.lox;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static craftinginterpreters.lox.TokenType.*;
@@ -40,6 +39,10 @@ public class Parser {
 
     private Stmt declaration(){
         try{
+            if(check(FUN)&&checkNext(IDENTIFIER)){
+                match(FUN);
+                return function("function");
+            }
             if(match(VAR)) return varDeclaration();
             return statement();
         }catch (ParseError error){
@@ -55,6 +58,7 @@ public class Parser {
         if(match(WHILE)) return whileStatement();
         if(match(FOR)) return forStatement();
         if (match(BREAK, CONTINUE)) return loopcontrolStatement();
+        if(match(RETURN)) return returnStatement();
         return expressionStatement();
     }
 
@@ -64,10 +68,41 @@ public class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt returnStatement(){
+        Token keyword = previous();
+        Expr value = null;
+        if(!check(SEMICOLON)){
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expected `;` after return value");
+        return new Stmt.Return(keyword, value);
+    }
+
     private Stmt expressionStatement(){
         Expr expr = expression();
         consume(SEMICOLON, "Expected `;` after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    private Stmt.Function function(String kind){ //этот же способ можно использовать для методов
+        Token name = consume(IDENTIFIER, "Expected "+kind+" name.");
+        consume(LEFT_PAREN, "Expected `(` after "+kind+" name.");
+        List<Token> parameters = new ArrayList<>();
+        if(!check(RIGHT_PAREN)){
+            do{
+                if(parameters.size()>=255){
+                    error(peek(), "Cannot have more than 255 parameters.");
+                }
+                parameters.add(consume(IDENTIFIER, "Expected parameter name."));
+            }while(match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect `)` after parameters.");
+
+        consume(LEFT_BRACE, "Expected `{` before "+kind+" body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(name, parameters, body);
+
     }
 
     private Stmt ifStatement(){
@@ -172,7 +207,8 @@ public class Parser {
             }
 
             error(equals, "Invalid assignment target.");
-        }else if(match(PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)){
+        }else
+            if(match(PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL)){
             Token equals = previous();
             Expr value = assignment();
 
@@ -229,7 +265,7 @@ public class Parser {
 
     private Expr ternary_operator() {
         //тернарный оператор ?:
-        Expr condition = or();
+        Expr condition = anonFunction();
         if(match(QUESTION)){ //не думаю, что можно составить схему a+b+c из тернарных операторов, так что if
             Token op1 = previous();
             Expr expr2 = expression();
@@ -241,6 +277,29 @@ public class Parser {
         }
         return condition;
     }
+
+    private Expr anonFunction(){
+        if(match(FUN)){
+            consume(LEFT_PAREN, "Expected `(` after anon function definition");
+            List<Token> parameters = new ArrayList<>();
+            if(!check(RIGHT_PAREN)){
+                do{
+                    if(parameters.size()>=255){
+                        error(peek(), "Cannot have more than 255 parameters.");
+                    }
+                    parameters.add(consume(IDENTIFIER, "Expected parameter name."));
+                }while(match(COMMA));
+            }
+            consume(RIGHT_PAREN, "Expect `)` after parameters.");
+
+            consume(LEFT_BRACE, "Expected `{` before anon function body.");
+            List<Stmt> body = block();
+            return new Expr.AnonFun( parameters, body);
+        }else{
+            return or();
+        }
+    }
+
 
     private Expr or(){
         Expr expr = and();
@@ -313,7 +372,33 @@ public class Parser {
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
-        return primary();
+        return call();
+    }
+
+    private Expr call(){
+        Expr expr = primary();
+        while(true){ // вспомогательный метод для обработки вызовов вида f(...)(...)...
+            if(match(LEFT_PAREN)){
+                expr = finishCall(expr);
+            }else{
+                break;
+            }
+        }
+        return expr;
+    }
+
+    private Expr finishCall(Expr calee){
+        List<Expr> arguments = new ArrayList<>();
+        if(!check(RIGHT_PAREN)){
+            do{ // a
+                if(arguments.size()>=255){
+                    error(peek(), "Cannot have more than 255 arguments.");
+                }
+                arguments.add(ternary_operator());
+            }while(match(COMMA)); //,b,c...
+        }
+        Token paren = consume(RIGHT_PAREN, "Expect `)` after argument list.");
+        return new Expr.Call(calee, paren, arguments);
     }
 
     private Expr primary(){
@@ -357,6 +442,11 @@ public class Parser {
     private boolean check(TokenType type) {
         if(isAtEnd()) return false;
         return peek().type == type;
+    }
+    private boolean checkNext(TokenType type){
+        if(current+1+1==this.tokens.size()) return false;
+        return tokens.get(current+1).type ==type;
+
     }
 
     private Token advance(){

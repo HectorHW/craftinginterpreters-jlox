@@ -13,6 +13,8 @@ abstract class Expr {
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
     R visitParameterlessInteractorExpr(ParameterlessInteractor expr);
+    R visitCallExpr(Call expr);
+    R visitAnonFunExpr(AnonFun expr);
   }
   static class Assign extends Expr {
     Assign(Token name, Expr value) {
@@ -132,6 +134,34 @@ abstract class Expr {
     return visitor.visitParameterlessInteractorExpr(this);
     }
     final Token name;
+  }
+  static class Call extends Expr {
+    Call(Expr calee, Token paren, List<Expr> arguments) {
+      this.calee = calee;
+      this.paren = paren;
+      this.arguments = arguments;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+    return visitor.visitCallExpr(this);
+    }
+    final Expr calee;
+    final Token paren;
+    final List<Expr> arguments;
+  }
+  static class AnonFun extends Expr {
+    AnonFun(List<Token> params, List<Stmt> body) {
+      this.params = params;
+      this.body = body;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+    return visitor.visitAnonFunExpr(this);
+    }
+    final List<Token> params;
+    final List<Stmt> body;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
