@@ -11,6 +11,7 @@ public class LoxPredefined {
         defineSleep(interpreter.globals);
         defineReadnum(interpreter.globals);
         defineReadline(interpreter.globals);
+        definePow(interpreter.globals);
     }
 
     static void defineClock(Environment env){
@@ -104,6 +105,29 @@ public class LoxPredefined {
                 }catch (InputMismatchException e){
                     throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readline", null, -1),
                         "failed to read with readline.");
+                }
+            }
+            @Override
+            public String toString(){
+                return "<native fn>";
+            }
+        });
+    }
+
+    static void definePow(Environment env){
+        env.define("pow", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 2;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                try{
+                    return Math.pow((Double) arguments.get(0), (Double)(arguments.get(1)));
+                }catch (ClassCastException e){
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "pow", null, -1),
+                        "arguments must be numbers.");
                 }
             }
             @Override
