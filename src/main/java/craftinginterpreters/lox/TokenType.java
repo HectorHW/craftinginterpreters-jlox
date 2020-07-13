@@ -22,7 +22,5 @@ public enum TokenType {
     BREAK, CONTINUE,
 
     EOF,
-    //для полноценной работы добавим способ чтения пользовательского ввода
-    READNUM, READLINE
 
 }

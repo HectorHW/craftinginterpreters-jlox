@@ -39,4 +39,12 @@ public class Environment {
     void define(String name, Object value){
         values.put(name, value);
     }
+
+    Object getOrDefault(Token name, Object otherwise){
+        if(values.containsKey(name.lexeme)){
+            return values.get(name.lexeme);
+        }
+        if(enclosing!=null) return enclosing.getOrDefault(name, otherwise);
+        return otherwise;
+    }
 }

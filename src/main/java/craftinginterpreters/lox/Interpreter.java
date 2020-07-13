@@ -22,17 +22,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     private Environment environment = globals;
 
     Interpreter(){
-        globals.define("clock", new LoxCallable() {
-            @Override
-            public int arity() { return 0; }
-
-            @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
-                return (double)System.currentTimeMillis()/1000.0;
-            }
-            @Override
-            public String toString(){return "<native fn>";}
-        });
+        LoxPredefined.bake(this);
 
     }
 
@@ -192,27 +182,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Object visitVariableExpr(Expr.Variable expr){
         return environment.get(expr.name);
-    }
-
-    @Override
-    public Object visitParameterlessInteractorExpr(Expr.ParameterlessInteractor expr) {
-        switch (expr.name.type) {
-            case READLINE -> {
-                var scanner = new java.util.Scanner(System.in);
-                return scanner.nextLine();
-            }
-            case READNUM -> {
-                var scanner = new java.util.Scanner(System.in);
-                try{
-                    return scanner.nextDouble();
-                }catch (InputMismatchException e){
-                    throw new RuntimeError(expr.name, "failed to read number with readnum.");
-                }
-
-            }
-            default -> throw new RuntimeError(expr.name, "Unknown parameterless");
-        }
-
     }
 
     @Override

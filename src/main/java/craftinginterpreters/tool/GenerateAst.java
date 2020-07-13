@@ -26,7 +26,6 @@ public class GenerateAst {
             "Logical : Expr left, Token operator, Expr right",
             "Unary : Token operator, Expr right",
             "Variable : Token name",
-            "ParameterlessInteractor : Token name",
             "Call : Expr calee, Token paren, List<Expr> arguments",
             "AnonFun : List<Token> params, List<Stmt> body"
         ));
