@@ -9,7 +9,7 @@ public class Parser {
     static class ParseError extends RuntimeException{}
     private final List<Token> tokens;
     private int current = 0;
-    private boolean inLoop = false;
+    //private boolean inLoop = false;
 
     Parser(List<Token> tokens){
         this.tokens = tokens;
@@ -128,9 +128,9 @@ public class Parser {
             condition = new Expr.Literal(true);
         }
 
-        inLoop = true;
+        //inLoop = true;
         Stmt body = statement();
-        inLoop = false;
+        //inLoop = false;
         return new Stmt.While(condition, body);
     }
 
@@ -159,9 +159,9 @@ public class Parser {
             increment = expression();
         }
         consume(RIGHT_PAREN, "Expected `)` after for clauses");
-        inLoop = true;
+        //inLoop = true;
         Stmt body = statement();
-        inLoop = false;
+        //inLoop = false;
         /*
         if(increment!=null){ //добавляем операцию инкремента в конец блока
             body = new Stmt.Block(Arrays.asList(
@@ -179,7 +179,7 @@ public class Parser {
     }
 
     private Stmt loopcontrolStatement(){
-        if(!inLoop) throw error(previous(), "loop control statement outside of loop.");
+        //if(!inLoop) throw error(previous(), "loop control statement outside of loop.");
         var statement = new Stmt.ControlStatement(previous());
         consume(SEMICOLON, "Expected `;` after loop control statement.");
         return statement;
