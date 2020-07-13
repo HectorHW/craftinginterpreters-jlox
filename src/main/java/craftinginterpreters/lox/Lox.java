@@ -67,6 +67,10 @@ public class Lox {
 
         if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
 
+        var resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+        if(hadError) return;
+
         //System.out.println(new AstPrinter().print(expression));
         interpreter.interpret(statements);
 
