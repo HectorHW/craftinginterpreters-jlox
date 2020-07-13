@@ -7,6 +7,7 @@ import java.util.Stack;
 
 //variable resolution
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
+    //TODO обращение к локальным переменным по идексу с адресацией в массиее вместо String и HashMap
     private final Interpreter interpreter;
     private final Stack<Map<String, Map<String, Object>>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
@@ -150,6 +151,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         for(int i=scopes.size()-1;i>=0;i--){
             if(scopes.get(i).containsKey(name.lexeme)){
                 interpreter.resolve(expr, scopes.size() -1 -i);
+                if(!scopes.isEmpty()){
+                    scopes.get(i).get(name.lexeme).put("used", null);
+                }
                 return;
             }
         }
@@ -220,15 +224,13 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitVariableExpr(Expr.Variable expr) {
-        if(!scopes.isEmpty() &&
+        if(!scopes.isEmpty() && scopes.peek().containsKey(expr.name.lexeme) &&
         scopes.peek().get(expr.name.lexeme).get("defined")==Boolean.FALSE) {
             //для кода вида var a; {var a = a;}
             Lox.error(expr.name,
                 "Cannot read local variable in its own initializer.");
         }
-        if(!scopes.isEmpty()){
-            scopes.peek().get(expr.name.lexeme).put("used", null);
-        }
+
 
         resolveLocal(expr, expr.name);
         return null;
