@@ -14,16 +14,24 @@ public class Lox {
 
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
-
+    static boolean reportWarning = false;
     public static void main(String[] args) throws IOException {
         //у нас есть два варианта использования интерпретатора:
         //исполнение файла или исполнение команд из стандартного ввода
-        if(args.length>1){
+        if(args.length>2){
             System.out.println("usage: jlox [script]");
             System.exit(64);
         }else if(args.length==1){
             runFile(args[0]);
-        }else{
+        }else if(args.length==2){
+            if(args[0].startsWith("-")){
+                if(args[0].contains("w")) reportWarning = true;
+                runFile(args[1]);
+            }else{
+                System.out.println("usage: jlox [-w] script | jlox");
+                System.exit(64);
+            }
+        } else{
             runPrompt();
         }
 
@@ -117,6 +125,15 @@ public class Lox {
     static void runtimeError(RuntimeError error){
         System.out.printf("%s\n[line %d]\n", error.getMessage(), error.token.line);
         hadRuntimeError = true;
+    }
+
+    static void warning(Token token, String message){
+        if(!reportWarning) return;
+        if(token.type == TokenType.EOF){
+            System.out.printf("at the end: warning: %s\n", message);
+        }else{
+            System.out.printf("[line %d] warning: %s\n", token.line, message);
+        }
     }
 
 }
