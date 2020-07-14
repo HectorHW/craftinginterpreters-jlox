@@ -100,6 +100,8 @@ public class Parser {
     }
 
     private Stmt.Function function(String kind){ //этот же способ можно использовать для методов
+        boolean isStatic = false;
+        if(match(STATIC)) isStatic = true;
         Token name = consume(IDENTIFIER, "Expected "+kind+" name.");
         consume(LEFT_PAREN, "Expected `(` after "+kind+" name.");
         List<Token> parameters = new ArrayList<>();
@@ -115,7 +117,7 @@ public class Parser {
 
         consume(LEFT_BRACE, "Expected `{` before "+kind+" body.");
         List<Stmt> body = block();
-        return new Stmt.Function(name, parameters, body);
+        return new Stmt.Function(name, parameters, body, isStatic);
 
     }
 

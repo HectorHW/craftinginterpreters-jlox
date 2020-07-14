@@ -1,19 +1,22 @@
 package craftinginterpreters.lox;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LoxClass implements LoxCallable{
+public class LoxClass extends LoxInstance implements LoxCallable{
+    static final LoxClass anyClass = new LoxClass("any", new HashMap<>());
     final String name;
     private final Map<String, LoxFunction> methods;
     LoxClass(String name, Map<String, LoxFunction> methods){
+        super(anyClass);
         this.name = name;
         this.methods = methods;
     }
 
     @Override
     public String toString(){
-        return name;
+        return name + " class";
     }
 
     @Override
@@ -38,5 +41,11 @@ public class LoxClass implements LoxCallable{
     LoxFunction findMethod(String name){
         if(methods.containsKey(name)) return methods.get(name);
         return null;
+    }
+
+    @Override
+    Object get(Token name){
+        if(methods.containsKey(name.lexeme)) return methods.get(name.lexeme);
+        throw new RuntimeError(name, "Undefined property '"+name.lexeme+"'.");
     }
 }

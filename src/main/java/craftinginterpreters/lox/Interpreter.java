@@ -214,7 +214,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Object visitAnonFunExpr(Expr.AnonFun expr) {
         //LoxFunction function = new LoxFunction(stmt, environment);
-        return new LoxFunction(new Stmt.Function(null, expr.params, expr.body), environment, false);
+        return new LoxFunction(new Stmt.Function(null, expr.params, expr.body, false), environment, false);
     }
 
     @Override

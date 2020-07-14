@@ -43,7 +43,7 @@ public class GenerateAst {
             "While : Expr condition, Stmt body",
             "For : Stmt init, Expr condition, Stmt body, Expr increment",
             "ControlStatement : Token parameter",
-            "Function : Token name, List<Token> params, List<Stmt> body",
+            "Function : Token name, List<Token> params, List<Stmt> body, boolean isStaticClassMethod",
             "Return : Token keyword, Expr value"
         ));
     }
