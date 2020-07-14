@@ -24,14 +24,18 @@ public class GenerateAst {
             "Grouping : Expr expression",
             "Literal : Object value",
             "Logical : Expr left, Token operator, Expr right",
+            "Set : Expr object, Token name, Expr value", // object.name = value
+            "This : Token keyword",
             "Unary : Token operator, Expr right",
             "Variable : Token name",
             "Call : Expr calee, Token paren, List<Expr> arguments",
-            "AnonFun : List<Token> params, List<Stmt> body"
+            "AnonFun : List<Token> params, List<Stmt> body",
+            "Get : Expr object, Token name" // код вида objectName.name
         ));
 
         defineAst(outputDir, "Stmt", Arrays.asList(
             "Block : List<Stmt> statements",
+            "Class : Token name, List<Stmt.Function> methods",
             "Expression : Expr expression",
             "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "Print : Expr expression",

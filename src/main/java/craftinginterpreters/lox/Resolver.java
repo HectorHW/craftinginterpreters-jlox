@@ -8,10 +8,14 @@ import java.util.Stack;
 //variable resolution
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     //TODO обращение к локальным переменным по идексу с адресацией в массиее вместо String и HashMap
+    private enum ClassType{
+        NONE, CLASS
+    }
     private final Interpreter interpreter;
     private final Stack<Map<String, Map<String, Object>>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private LoopType currentLoop = LoopType.NONE;
+    private ClassType currentClass = ClassType.NONE;
     Resolver(Interpreter interpreter){
         this.interpreter = interpreter;
     }
@@ -21,6 +25,26 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         beginScope();
         resolve(stmt.statements);
         endScope();
+        return null;
+    }
+
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        var enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+        declare(stmt.name);
+        define(stmt.name);
+
+        beginScope();
+        createVariableEntry(scopes.peek(), new Token(TokenType.THIS, "this", null, stmt.name.line));
+
+        for(var method : stmt.methods){
+            var declaration = method.name.lexeme.equals("init") ? FunctionType.INITIALIZER : FunctionType.METHOD;
+
+            resolveFunction(method, declaration);
+        }
+        endScope();
+        currentClass = enclosingClass;
         return null;
     }
 
@@ -98,7 +122,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         if(currentFunction == FunctionType.NONE){
             Lox.error(stmt.keyword, "Cannot return from top-level code.");
         }
+        //использование return something; в инициализаторе запрещено
+        // но просто return; в инициализаторе имеет смысл для досрочного выхода
         if(stmt.value!=null){
+            if(currentFunction==FunctionType.INITIALIZER)
+                Lox.error(stmt.keyword, "Cannot return value from initializer.");
+
             resolve(stmt.value);
         }
         return null;
@@ -122,9 +151,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private void endScope(){
-        for(var record : scopes.peek().values()){
-            if(record.get("used")!=null){
-                Lox.warning((Token)record.get("used"), "Unused variable "+((Token) record.get("used")).lexeme);
+        for(var record : scopes.peek().entrySet()){
+            if(record.getValue().get("used")!=null && !record.getKey().equals("this")){
+                Lox.warning((Token)record.getValue().get("used"), "Unused variable "+((Token) record.getValue().get("used")).lexeme);
             }
         }
 
@@ -217,6 +246,23 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     @Override
+    public Void visitSetExpr(Expr.Set expr) {
+        resolve(expr.value);
+        resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Void visitThisExpr(Expr.This expr) {
+        if(currentClass==ClassType.NONE){
+            Lox.error(expr.keyword, "Cannot use `this` outside of a class.");
+            return null;
+        }
+        resolveLocal(expr, expr.keyword);
+        return null;
+    }
+
+    @Override
     public Void visitUnaryExpr(Expr.Unary expr) {
         resolve(expr.right);
         return null;
@@ -258,6 +304,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         resolve(expr.body);
         endScope();
         currentFunction = enclosingFunction;
+        return null;
+    }
+
+    @Override
+    public Void visitGetExpr(Expr.Get expr) {
+        resolve(expr.object);
         return null;
     }
 
