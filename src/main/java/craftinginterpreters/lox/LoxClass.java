@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 public class LoxClass extends LoxInstance implements LoxCallable{
-    static final LoxClass anyClass = new LoxClass("any", new HashMap<>());
+    static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
     final String name;
+    final LoxClass superclass;
     private final Map<String, LoxFunction> methods;
-    LoxClass(String name, Map<String, LoxFunction> methods){
+    LoxClass(String name,LoxClass superclass, Map<String, LoxFunction> methods){
         super(anyClass);
         this.name = name;
         this.methods = methods;
+        this.superclass = superclass;
     }
 
     @Override
@@ -40,12 +42,15 @@ public class LoxClass extends LoxInstance implements LoxCallable{
 
     LoxFunction findMethod(String name){
         if(methods.containsKey(name)) return methods.get(name);
+        if(superclass!=null) return superclass.findMethod(name);
+
         return null;
     }
 
     @Override
     Object get(Token name){
-        if(methods.containsKey(name.lexeme)) return methods.get(name.lexeme);
+        Object method = this.findMethod(name.lexeme);
+        if(method!=null) return method;
         throw new RuntimeError(name, "Undefined property '"+name.lexeme+"'.");
     }
 }

@@ -9,7 +9,7 @@ import java.util.Stack;
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     //TODO обращение к локальным переменным по идексу с адресацией в массиее вместо String и HashMap
     private enum ClassType{
-        NONE, CLASS
+        NONE, CLASS, SUBCLASS
     }
     private final Interpreter interpreter;
     private final Stack<Map<String, Map<String, Object>>> scopes = new Stack<>();
@@ -35,6 +35,21 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         declare(stmt.name);
         define(stmt.name);
 
+        if(stmt.superclass !=null && stmt.name.lexeme.equals(stmt.superclass.name.lexeme)){
+            Lox.error(stmt.superclass.name,
+                "Class cannot inherit itself.");
+        } // случай class A < A недопустим
+
+        if(stmt.superclass!=null){
+            currentClass = ClassType.SUBCLASS;
+            resolve(stmt.superclass);
+        }
+
+        if(stmt.superclass!=null){
+            beginScope();
+            createVariableEntry(scopes.peek(), new Token(TokenType.SUPER, "super", null, stmt.name.line));
+        }
+
         beginScope();
         createVariableEntry(scopes.peek(), new Token(TokenType.THIS, "this", null, stmt.name.line));
 
@@ -44,6 +59,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
             resolveFunction(method, declaration);
         }
         endScope();
+
+        if(stmt.superclass!=null) endScope();
         currentClass = enclosingClass;
         return null;
     }
@@ -152,7 +169,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     private void endScope(){
         for(var record : scopes.peek().entrySet()){
-            if(record.getValue().get("used")!=null && !record.getKey().equals("this")){
+            if(record.getValue().get("used")!=null
+                && !record.getKey().equals("this")
+                && !record.getKey().equals("super")
+            ){
                 Lox.warning((Token)record.getValue().get("used"), "Unused variable "+((Token) record.getValue().get("used")).lexeme);
             }
         }
@@ -258,6 +278,19 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
             Lox.error(expr.keyword, "Cannot use `this` outside of a class.");
             return null;
         }
+        resolveLocal(expr, expr.keyword);
+        return null;
+    }
+
+    @Override
+    public Void visitSuperExpr(Expr.Super expr) {
+        if(currentClass==ClassType.NONE){
+            Lox.error(expr.keyword, "Cannot use `super` outside of a class.");
+        }else if(currentClass!=ClassType.SUBCLASS){
+            Lox.error(expr.keyword, "Cannot use `super` in a class with no superclass.");
+        }
+
+
         resolveLocal(expr, expr.keyword);
         return null;
     }
