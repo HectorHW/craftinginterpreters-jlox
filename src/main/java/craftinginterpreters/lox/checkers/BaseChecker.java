@@ -186,17 +186,17 @@ public class BaseChecker implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         return null;
     }
 
-    protected void resolve(List<Stmt> statements){
+    public void resolve(List<Stmt> statements){
         for(Stmt stmt : statements){
             resolve(stmt);
         }
     }
 
-    protected void resolve(Expr expr){
+    public void resolve(Expr expr){
         expr.accept(this);
     }
 
-    protected void resolve(Stmt stmt){
+    public void resolve(Stmt stmt){
         stmt.accept(this);
     }
 
