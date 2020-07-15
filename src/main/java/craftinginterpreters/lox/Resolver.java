@@ -10,7 +10,7 @@ import java.util.Stack;
     public class Resolver extends craftinginterpreters.lox.checkers.BaseChecker{
     //TODO обращение к локальным переменным по идексу с адресацией в массиее вместо String и HashMap
     private final Interpreter interpreter;
-    private final Stack<Map<String, Map<String, Object>>> scopes = new Stack<>();
+    private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     Resolver(Interpreter interpreter){
         this.interpreter = interpreter;
     }
@@ -39,11 +39,11 @@ import java.util.Stack;
 
         if(stmt.superclass!=null){
             beginScope();
-            createVariableEntry(scopes.peek(), new Token(TokenType.SUPER, "super", null, stmt.name.line));
+            scopes.peek().put("super", true);
         }
 
         beginScope();
-        createVariableEntry(scopes.peek(), new Token(TokenType.THIS, "this", null, stmt.name.line));
+        scopes.peek().put("this", true);
 
         for(var method : stmt.methods){
             var declaration = method.name.lexeme.equals("init") ? FunctionType.INITIALIZER : FunctionType.METHOD;
@@ -80,15 +80,6 @@ import java.util.Stack;
     }
 
     private void endScope(){
-        for(var record : scopes.peek().entrySet()){
-            if(record.getValue().get("used")!=null
-                && !record.getKey().equals("this")
-                && !record.getKey().equals("super")
-            ){
-                Lox.warning((Token)record.getValue().get("used"), "Unused variable "+((Token) record.getValue().get("used")).lexeme);
-            }
-        }
-
         scopes.pop();
     }
 
@@ -98,27 +89,22 @@ import java.util.Stack;
         if(scope.containsKey(name.lexeme)){
             Lox.error(name, "Variable with this name already declared in this scope");
         }
-
-        createVariableEntry(scope, name);
+        scope.put(name.lexeme, false);
     }
 
     private void define(Token name){
         if(scopes.isEmpty()) return;
-        //scopes.peek().put(name.lexeme, true);
-        scopes.peek().get(name.lexeme).put("defined", true);
+        scopes.peek().put(name.lexeme, true);
     }
 
-    private void resolveLocal(Expr expr, Token name){
-        for(int i=scopes.size()-1;i>=0;i--){
-            if(scopes.get(i).containsKey(name.lexeme)){
-                interpreter.resolve(expr, scopes.size() -1 -i);
-                if(!scopes.isEmpty()){
-                    scopes.get(i).get(name.lexeme).put("used", null);
-                }
+    private void resolveLocal(Expr expr, Token name) {
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            if (scopes.get(i).containsKey(name.lexeme)) {
+                interpreter.resolve(expr, scopes.size() - 1 - i);
                 return;
             }
         }
-        //Not found. Assume it is global
+        // переменная не была найдена, так что положим что она глобальная
     }
 
     private void resolveFunction(Stmt.Function function, FunctionType type){
@@ -153,9 +139,8 @@ import java.util.Stack;
 
     @Override
     public Void visitVariableExpr(Expr.Variable expr) {
-        if(!scopes.isEmpty() && scopes.peek().containsKey(expr.name.lexeme) &&
-        scopes.peek().get(expr.name.lexeme).get("defined")==Boolean.FALSE) {
-            //для кода вида var a; {var a = a;}
+        if (!scopes.isEmpty() &&
+            scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
             Lox.error(expr.name,
                 "Cannot read local variable in its own initializer.");
         }

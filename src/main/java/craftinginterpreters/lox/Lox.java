@@ -139,7 +139,7 @@ public class Lox {
         hadRuntimeError = true;
     }
 
-    static void warning(Token token, String message){
+    public static void warning(Token token, String message){
         if(!reportWarning) return;
         if(token.type == TokenType.EOF){
             System.out.printf("at the end: warning: %s\n", message);
