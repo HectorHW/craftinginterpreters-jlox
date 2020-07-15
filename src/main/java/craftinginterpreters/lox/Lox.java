@@ -2,6 +2,7 @@ package craftinginterpreters.lox;
 
 import craftinginterpreters.lox.checkers.BaseChecker;
 import craftinginterpreters.lox.checkers.CheckExecutor;
+import craftinginterpreters.lox.checkers.PreResolveCheckExecutor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,6 +78,11 @@ public class Lox {
         List<Stmt> statements = parser.parse();
 
         if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
+
+        var preresolve_check = new PreResolveCheckExecutor();
+        preresolve_check.check(statements);
+        if(hadError) return;
+
         var resolver = new Resolver(interpreter);
         resolver.resolve(statements);
         if(hadError) return;

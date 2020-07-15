@@ -8,13 +8,8 @@ import java.util.Stack;
 //variable resolution
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     //TODO обращение к локальным переменным по идексу с адресацией в массиее вместо String и HashMap
-    private enum ClassType{
-        NONE, CLASS, SUBCLASS
-    }
     private final Interpreter interpreter;
     private final Stack<Map<String, Map<String, Object>>> scopes = new Stack<>();
-    private FunctionType currentFunction = FunctionType.NONE;
-    private ClassType currentClass = ClassType.NONE;
     Resolver(Interpreter interpreter){
         this.interpreter = interpreter;
     }
@@ -29,8 +24,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
-        var enclosingClass = currentClass;
-        currentClass = ClassType.CLASS;
         declare(stmt.name);
         define(stmt.name);
 
@@ -40,7 +33,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         } // случай class A < A недопустим
 
         if(stmt.superclass!=null){
-            currentClass = ClassType.SUBCLASS;
             resolve(stmt.superclass);
         }
 
@@ -60,7 +52,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         endScope();
 
         if(stmt.superclass!=null) endScope();
-        currentClass = enclosingClass;
         return null;
     }
 
@@ -192,8 +183,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
 
     private void resolveFunction(Stmt.Function function, FunctionType type){
-        FunctionType enclosingFunction = currentFunction;
-        currentFunction = type;
         beginScope();
         for(Token param: function.params){
             declare(param);
@@ -201,7 +190,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         }
         resolve(function.body);
         endScope();
-        currentFunction = enclosingFunction;
+
     }
 
     @Override
@@ -253,23 +242,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitThisExpr(Expr.This expr) {
-        if(currentClass==ClassType.NONE){
-            Lox.error(expr.keyword, "Cannot use `this` outside of a class.");
-            return null;
-        }
         resolveLocal(expr, expr.keyword);
         return null;
     }
 
     @Override
     public Void visitSuperExpr(Expr.Super expr) {
-        if(currentClass==ClassType.NONE){
-            Lox.error(expr.keyword, "Cannot use `super` outside of a class.");
-        }else if(currentClass!=ClassType.SUBCLASS){
-            Lox.error(expr.keyword, "Cannot use `super` in a class with no superclass.");
-        }
-
-
         resolveLocal(expr, expr.keyword);
         return null;
     }
@@ -289,7 +267,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
                 "Cannot read local variable in its own initializer.");
         }
 
-
         resolveLocal(expr, expr.name);
         return null;
     }
@@ -306,8 +283,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitAnonFunExpr(Expr.AnonFun expr) {
-        FunctionType enclosingFunction = currentFunction;
-        currentFunction = FunctionType.FUNCTION;
         beginScope();
         for(Token param: expr.params){
             declare(param);
@@ -315,7 +290,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         }
         resolve(expr.body);
         endScope();
-        currentFunction = enclosingFunction;
         return null;
     }
 
