@@ -49,6 +49,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
         switch (expr.operator.type){
             case MINUS:
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "minus_", right, expr);
+                }
                 checkNumberOperands(expr.operator, left, right);
                 return (double)left - (double)right;
 
@@ -65,9 +68,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                     return stringify(left)+stringify(right);
                 }
 
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "plus_", right, expr);
+                }
+
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or two strings or string and number");
             case SLASH:
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "slash_", right, expr);
+                }
                 checkNumberOperands(expr.operator, left, right);
                 checkZeroDivision(expr.operator, (Double)right);
                 return (double)left / (double)right;
@@ -83,6 +93,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                         "Right operand of string repetition should be >=1");
                     return ((String)left).repeat(repeat_number);
                 }
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "star_", right, expr);
+                }
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or string and a number");
 
@@ -92,6 +105,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 }
                 if(left instanceof String && right instanceof String){
                     return ((String) left).compareTo((String)right)>0;
+                }
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "g_", right, expr);
                 }
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or two strings");
@@ -103,6 +119,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 if(left instanceof String && right instanceof String){
                     return ((String) left).compareTo((String)right)>=0;
                 }
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "ge_", right, expr);
+                }
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or two strings");
 
@@ -113,6 +132,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 if(left instanceof String && right instanceof String){
                     return ((String) left).compareTo((String)right)<0;
                 }
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "l_", right, expr);
+                }
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or two strings");
 
@@ -122,6 +144,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 }
                 if(left instanceof String && right instanceof String){
                     return ((String) left).compareTo((String)right)<=0;
+                }
+                if(left instanceof LoxInstance){
+                    return callSpecialMethod((LoxInstance)left, "le_", right, expr);
                 }
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or two strings");
@@ -136,6 +161,28 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
 
         return null;
+    }
+
+    Object callSpecialMethod(LoxInstance object, String methodName, Object right, Expr.Binary expr){
+        Object f;
+        try{
+            f = object.get(new Token(TokenType.IDENTIFIER, "plus_", null, expr.operator.line));
+        }catch (RuntimeError ignored){
+            throw new RuntimeError(expr.operator,
+                "failed to find special method "+methodName+" on left operand.");
+        }
+       if(f instanceof LoxFunction){
+            LoxFunction ff = (LoxFunction)f;
+            if(ff.arity()!=1){
+                throw new RuntimeError(expr.operator,
+                    "wrong arity of special method "+methodName+" on left operand.");
+            }
+            return ff.call(this, Collections.singletonList(right));
+        }else{
+           throw new RuntimeError(expr.operator,
+               methodName+" is not method");
+       }
+
     }
 
 
