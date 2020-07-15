@@ -12,5 +12,6 @@ public class CheckExecutor {
 
     public void check(List<Stmt> statements){
         rc.resolve(statements);
+        new BreakContinueChecker().resolve(statements);
     }
 }

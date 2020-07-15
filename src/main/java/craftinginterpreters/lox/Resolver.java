@@ -14,7 +14,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private final Interpreter interpreter;
     private final Stack<Map<String, Map<String, Object>>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
-    private LoopType currentLoop = LoopType.NONE;
     private ClassType currentClass = ClassType.NONE;
     Resolver(Interpreter interpreter){
         this.interpreter = interpreter;
@@ -98,10 +97,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitWhileStmt(Stmt.While stmt) {
         resolve(stmt.condition);
-        LoopType prev = currentLoop;
-        currentLoop = LoopType.WHILE;
         resolve(stmt.body);
-        currentLoop = prev;
         return null;
     }
 
@@ -110,18 +106,12 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         if(stmt.init!=null) resolve(stmt.init);
         if(stmt.condition!=null) resolve(stmt.condition);
         if(stmt.increment!=null) resolve(stmt.increment);
-        LoopType prev = currentLoop;
-        currentLoop = LoopType.FOR;
         resolve(stmt.body);
-        currentLoop = prev;
         return null;
     }
 
     @Override
     public Void visitControlStatementStmt(Stmt.ControlStatement stmt) {
-        if(currentLoop == LoopType.NONE){
-            Lox.error(stmt.parameter, "Loop control statement outside of loop.");
-        }
         return null;
     }
 
@@ -205,8 +195,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         FunctionType enclosingFunction = currentFunction;
         currentFunction = type;
         beginScope();
-        LoopType enclosingLoop = currentLoop;
-        currentLoop = LoopType.NONE;
         for(Token param: function.params){
             declare(param);
             define(param);
@@ -214,7 +202,6 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         resolve(function.body);
         endScope();
         currentFunction = enclosingFunction;
-        currentLoop = enclosingLoop;
     }
 
     @Override
