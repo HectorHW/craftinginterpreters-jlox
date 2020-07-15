@@ -1,5 +1,8 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.checkers.BaseChecker;
+import craftinginterpreters.lox.checkers.CheckExecutor;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,9 +77,12 @@ public class Lox {
         List<Stmt> statements = parser.parse();
 
         if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
-
         var resolver = new Resolver(interpreter);
         resolver.resolve(statements);
+        if(hadError) return;
+
+        var checker = new CheckExecutor();
+        checker.check(statements);
         if(hadError) return;
 
         //System.out.println(new AstPrinter().print(expression));
@@ -105,11 +111,11 @@ public class Lox {
 
 
     //сообщения об ошибках
-    static void error(int line, String message){
+    public static void error(int line, String message){
         report(line, "", message);
     }
 
-    static void error(Token token, String message){
+    public static void error(Token token, String message){
         if(token.type == TokenType.EOF){
             report(token.line, " at end", message);
         }else{
