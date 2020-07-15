@@ -1,0 +1,22 @@
+class A{
+    init(data){
+        this.data = data;
+    }
+    plus_(other){
+        return this.data + other.data;
+    }
+    //plus_ +
+    //minus_ -
+    //star_ *
+    //slash_ /
+    //g_ >
+    //ge_ >=
+    //l_ <
+    //le_ <=
+
+}
+
+var a = A(1);
+var b = A(3);
+
+print a+b;
