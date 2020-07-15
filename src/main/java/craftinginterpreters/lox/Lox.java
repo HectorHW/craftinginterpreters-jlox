@@ -1,5 +1,9 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.checkers.BaseChecker;
+import craftinginterpreters.lox.checkers.CheckExecutor;
+import craftinginterpreters.lox.checkers.PreResolveCheckExecutor;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -75,8 +79,16 @@ public class Lox {
 
         if(hadError) return; //в случае ошибки выходим так как дерева тогда у нас нет
 
+        var preresolve_check = new PreResolveCheckExecutor();
+        preresolve_check.check(statements);
+        if(hadError) return;
+
         var resolver = new Resolver(interpreter);
         resolver.resolve(statements);
+        if(hadError) return;
+
+        var checker = new CheckExecutor();
+        checker.check(statements);
         if(hadError) return;
 
         //System.out.println(new AstPrinter().print(expression));
@@ -105,11 +117,11 @@ public class Lox {
 
 
     //сообщения об ошибках
-    static void error(int line, String message){
+    public static void error(int line, String message){
         report(line, "", message);
     }
 
-    static void error(Token token, String message){
+    public static void error(Token token, String message){
         if(token.type == TokenType.EOF){
             report(token.line, " at end", message);
         }else{
@@ -127,7 +139,7 @@ public class Lox {
         hadRuntimeError = true;
     }
 
-    static void warning(Token token, String message){
+    public static void warning(Token token, String message){
         if(!reportWarning) return;
         if(token.type == TokenType.EOF){
             System.out.printf("at the end: warning: %s\n", message);
