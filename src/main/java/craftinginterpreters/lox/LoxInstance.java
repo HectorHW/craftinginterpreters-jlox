@@ -24,4 +24,8 @@ public class LoxInstance {
     void set(Token name, Object value){
         fields.put(name.lexeme, value);
     }
+
+    public LoxClass getLoxClass(){
+        return loxClass;
+    }
 }

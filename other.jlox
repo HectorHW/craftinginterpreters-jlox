@@ -1,0 +1,5 @@
+class Math{
+    static pow(a, b){
+        return pow(a,b);
+    }
+}
