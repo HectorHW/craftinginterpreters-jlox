@@ -1,6 +1,18 @@
 var s = 1;
+var start = clock();
+var math = import("other.Math");
+var finish = clock();
+print math;
+print math.pow(2,3);
 
-var f = import("other.f");
+print finish - start;
 
-print f;
-print f(1);
+var a = "global";
+var f = fun(){print a;};
+{
+    var a = "local";
+    f();
+    print a;
+}
+a = "global2";
+f();
