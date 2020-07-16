@@ -1,6 +1,11 @@
 
 package craftinginterpreters.lox;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -12,6 +17,11 @@ public class LoxPredefined {
         defineReadnum(interpreter.globals);
         defineReadline(interpreter.globals);
         definePow(interpreter.globals);
+        defineClasses(interpreter.globals);
+        defineType(interpreter.globals);
+        defineArity(interpreter.globals);
+        defineAssert(interpreter.globals);
+        defineImport(interpreter.globals);
     }
 
     static void defineClock(Environment env){
@@ -36,16 +46,16 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
+            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
                 if(!(arguments.get(0) instanceof Double)){
-                    throw new RuntimeError(new Token(TokenType.NIL, "", null, -1),
+                    throw new RuntimeError(paren,
                         "argument must be a number");
                 }
 
                 try {
                     long time = Math.round((double)arguments.get(0));
                     if(time<0){
-                        throw new RuntimeError(new Token(TokenType.NIL, "", null, -1),
+                        throw new RuntimeError(paren,
                             "time cannot be negative.");
                     }
                     Thread.sleep(time);
@@ -94,7 +104,7 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
+            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
                 try{
                     Scanner scanner =
                         (Scanner) interpreter.globals.getOrDefault(
@@ -103,7 +113,7 @@ public class LoxPredefined {
                     interpreter.globals.define("+StdIn+", scanner);
                     return scanner.nextLine();
                 }catch (InputMismatchException e){
-                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readline", null, -1),
+                    throw new RuntimeError(paren,
                         "failed to read with readline.");
                 }
             }
@@ -122,11 +132,89 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
+            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
                 try{
                     return Math.pow((Double) arguments.get(0), (Double)(arguments.get(1)));
                 }catch (ClassCastException e){
-                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "pow", null, -1),
+                    throw new RuntimeError(paren,
+                        "arguments must be numbers.");
+                }
+            }
+            @Override
+            public String toString(){
+                return "<native fn>";
+            }
+        });
+    }
+    
+    static void defineClasses(Environment env) {
+        env.define("String", new LoxClass("String", LoxClass.anyClass, new HashMap<>()));
+        env.define("Number", new LoxClass("Number", LoxClass.anyClass, new HashMap<>()));
+        env.define("Class", LoxClass.anyClass);
+        env.define("Function", new LoxClass("Function", LoxClass.anyClass, new HashMap<>()));
+        env.define("Object", new LoxClass("Object", LoxClass.anyClass, new HashMap<>()));
+        env.define("Boolean", new LoxClass("Boolean", LoxClass.anyClass, new HashMap<>()));
+        env.define("Nil", new LoxClass("Nil", LoxClass.anyClass, new HashMap<>()));
+
+    }
+
+    static void defineType(Environment env){
+        env.define("type", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Object argument = arguments.get(0);
+                if(argument instanceof String){
+                    return env.get(new Token(TokenType.IDENTIFIER, "String", null, -1));
+                }
+                if(argument instanceof Double){
+                    return env.get(new Token(TokenType.IDENTIFIER, "Number", null, -1));
+                }
+                if(argument instanceof LoxClass){
+                    return env.get(new Token(TokenType.IDENTIFIER, "Class", null, -1));
+                }
+                if(argument instanceof LoxFunction){
+                    return env.get(new Token(TokenType.IDENTIFIER, "Function", null, -1));
+                }
+                if(argument instanceof LoxInstance){
+                    return ((LoxInstance)argument).getLoxClass();
+                }
+                if(argument instanceof Boolean){
+                    return env.get(new Token(TokenType.IDENTIFIER, "Boolean", null, -1));
+                }
+                if(argument==null){
+                    return env.get(new Token(TokenType.IDENTIFIER, "Nil", null, -1));
+                }
+
+                throw new RuntimeError(new Token(TokenType.IDENTIFIER, "type", null, -1),
+                    "could not identify type.");
+                
+            }
+            @Override
+            public String toString(){
+                return "<native fn>";
+            }
+        });
+    }
+
+    static void defineArity(Environment env){
+        env.define("arity", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+                try{
+                    LoxFunction ff = (LoxFunction)arguments.get(0);
+                    return ff.arity();
+                }catch (ClassCastException e){
+                    throw new RuntimeError(paren,
                         "arguments must be numbers.");
                 }
             }
@@ -137,4 +225,89 @@ public class LoxPredefined {
         });
     }
 
+    static void defineAssert(Environment env){
+        env.define("assert", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+                Object argument = arguments.get(0);
+                if(!interpreter.isTruthy(argument)) throw new RuntimeError(paren, "assertion error.");
+                return argument;
+            }
+        });
+    }
+
+    static void defineImport(Environment env){
+        env.define("import", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+                if(!(arguments.get(0) instanceof String)){
+                    throw new RuntimeError(paren,
+                        "arguments must be numbers.");
+                }
+
+                String argument = (String)arguments.get(0);
+
+                String[] subparams = argument.split("\\.");
+                if(subparams.length==1){
+                    try{
+                        return env.get(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line));
+                    }catch (RuntimeError e){
+                        throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                            "Failed to resolve name "+argument+".");
+                    }
+
+                }
+                if(subparams.length>=2){
+                    StringBuilder sb = new StringBuilder();
+                    for(int i=0;i<subparams.length-2;i++){
+                        sb.append(subparams[i]);
+                        sb.append("/");
+                    }
+                    String path = sb.toString() + subparams[subparams.length-2] + ".jlox";
+                    String fname = subparams[subparams.length-1];
+
+
+                    if(interpreter.importer_files.containsKey(path)){
+                        try{
+                            return interpreter.importer_files.get(path).get(new Token(TokenType.IDENTIFIER, fname, fname, paren.line));
+                        }catch (RuntimeError e){
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                                "Failed to resolve name "+argument+".");
+                        }
+
+                    }else{
+                        try{
+                            Environment res = executeForEnvironment(path);
+                            interpreter.importer_files.put(path, res);
+                            return res.get(new Token(TokenType.IDENTIFIER, fname, fname, paren.line));
+                        }catch (IOException e){
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                                "Failed to find file"+path+".");
+                        }catch (Parser.ParseError | Resolver.ResolveError | RuntimeError e){
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                                "Failed to execute file"+path+".");
+                        }
+                    }
+                }else{
+                    return null;
+                }
+            }
+
+            private Environment executeForEnvironment(String filename) throws IOException{
+                byte[] bytes = Files.readAllBytes(Paths.get(filename));
+                return Lox.runForEnvironment(new String(bytes, Charset.defaultCharset()));
+            }
+
+        });
+    }
 }

@@ -96,6 +96,33 @@ public class Lox {
 
     }
 
+    public static Environment runForEnvironment(String source){
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.scanTokens();
+        //System.out.println(tokens);
+
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+
+        if(hadError) throw new Parser.ParseError(); //в случае ошибки выходим так как дерева тогда у нас нет
+
+        var preresolve_check = new PreResolveCheckExecutor();
+        preresolve_check.check(statements);
+        if(hadError) throw new Resolver.ResolveError();
+
+        var resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+        if(hadError) throw new Resolver.ResolveError();
+
+        var checker = new CheckExecutor();
+        checker.check(statements);
+        if(hadError) throw new Resolver.ResolveError();
+
+        //System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(statements);
+        return interpreter.globals;
+    }
+
     private static void runAsREPLExpression(String source){
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();

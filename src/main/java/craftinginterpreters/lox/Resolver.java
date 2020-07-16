@@ -8,6 +8,7 @@ import java.util.Stack;
 //variable resolution
 //public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public class Resolver extends craftinginterpreters.lox.checkers.BaseChecker{
+        public static class ResolveError extends RuntimeException{}
     //TODO обращение к локальным переменным по идексу с адресацией в массиее вместо String и HashMap
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();

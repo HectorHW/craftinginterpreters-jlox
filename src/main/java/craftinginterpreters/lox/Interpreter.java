@@ -16,6 +16,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
 
+    public final Map<String, Environment> importer_files = new HashMap<>();
     final Environment globals = new Environment();
     private Environment environment = globals;
     private final Map<Expr, Integer> locals = new HashMap<>();
@@ -255,7 +256,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             throw new RuntimeError(expr.paren,
                 String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
         }
-        return function.call(this, arguments);
+        return function.call(this, arguments, expr.paren);
     }
 
     @Override
@@ -338,7 +339,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         }
     }
 
-    private boolean isTruthy(Object object){
+    public boolean isTruthy(Object object){
         if(object==null) return false;
         if(object instanceof Boolean) return (boolean)object;
         if(object instanceof Double){
