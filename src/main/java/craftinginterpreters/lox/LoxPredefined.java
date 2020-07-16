@@ -286,17 +286,26 @@ public class LoxPredefined {
                         }
 
                     }else{
+                        Environment res;
                         try{
-                            Environment res = executeForEnvironment(path);
-                            interpreter.importer_files.put(path, res);
-                            return res.get(new Token(TokenType.IDENTIFIER, fname, fname, paren.line));
+                            res = executeForEnvironment(path);
+
                         }catch (IOException e){
                             throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
-                                "Failed to find file"+path+".");
+                                "Failed to find file "+path+" while importing.");
                         }catch (Parser.ParseError | Resolver.ResolveError | RuntimeError e){
                             throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
-                                "Failed to execute file"+path+".");
+                                "Failed to execute file "+path+" while importing.");
                         }
+
+                        interpreter.importer_files.put(path, res);
+                        try{
+                            return res.get(new Token(TokenType.IDENTIFIER, fname, fname, paren.line));
+                        }catch (RuntimeError e){
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                                "Could not find name "+fname+" in file "+path+" while importing.");
+                        }
+
                     }
                 }else{
                     return null;
