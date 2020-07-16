@@ -1,0 +1,6 @@
+var s = 1;
+
+var f = import("other.f");
+
+print f;
+print f(1);
