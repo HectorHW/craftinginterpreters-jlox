@@ -1,6 +1,7 @@
 package craftinginterpreters.lox;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
@@ -174,7 +175,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         }
        if(f instanceof LoxFunction){
             LoxFunction ff = (LoxFunction)f;
-            if(ff.arity()!=1){
+            if(!ff.arity().equals(Collections.singleton(1))){
                 throw new RuntimeError(expr.operator,
                     "wrong arity of special method "+methodName+" on left operand.");
             }
@@ -252,9 +253,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable function = (LoxCallable)callee;
-        if(arguments.size()!=function.arity()){
+        if(!function.arity().contains(arguments.size()))
+            {
             throw new RuntimeError(expr.paren,
-                String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
+                String.format("Expected %s arguments but got %d.",
+                    function.arity().stream().map(String::valueOf).collect(Collectors.joining(" or ")),
+                    arguments.size()));
         }
         return function.call(this, arguments, expr.paren);
     }

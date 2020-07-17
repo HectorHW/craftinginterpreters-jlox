@@ -1,8 +1,6 @@
 package craftinginterpreters.lox;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LoxClass extends LoxInstance implements LoxCallable{
     public static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
@@ -22,9 +20,9 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     }
 
     @Override
-    public int arity() {
+    public Set<Integer> arity() {
         var initializer = findMethod("init");
-        if(initializer==null) return 0;
+        if(initializer==null) return Collections.singleton(0);
         return initializer.arity();
     }
 

@@ -26,8 +26,8 @@ public class StdIO extends LoxClass {
     private void define_methods(StdIoInstance instance){
         instance.fields.put("readNum", new LoxCallable() {
             @Override
-            public int arity() {
-                return 0;
+            public Set<Integer> arity() {
+                return Collections.singleton(0);
             }
 
             @Override
@@ -49,8 +49,8 @@ public class StdIO extends LoxClass {
 
         instance.fields.put("readLine", new LoxCallable() {
             @Override
-            public int arity() {
-                return 0;
+            public Set<Integer> arity() {
+                return Collections.singleton(0);
             }
 
             @Override
@@ -71,8 +71,8 @@ public class StdIO extends LoxClass {
 
         instance.fields.put("print", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
@@ -85,8 +85,8 @@ public class StdIO extends LoxClass {
 
         instance.fields.put("println", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
@@ -99,7 +99,9 @@ public class StdIO extends LoxClass {
     }
 
     @Override
-    public int arity() {return 0;}
+    public Set<Integer> arity() {
+        return Collections.singleton(0);
+    }
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {

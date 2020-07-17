@@ -1,6 +1,8 @@
 package craftinginterpreters.lox;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class LoxFunction implements LoxCallable {
     private final Stmt.Function declaration;
@@ -19,8 +21,8 @@ public class LoxFunction implements LoxCallable {
     }
 
     @Override
-    public int arity() {
-        return declaration.params.size();
+    public Set<Integer> arity() {
+        return Collections.singleton(declaration.params.size());
     }
 
     @Override
