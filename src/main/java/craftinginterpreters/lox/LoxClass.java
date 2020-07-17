@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 public class LoxClass extends LoxInstance implements LoxCallable{
-    static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
+    public static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
     final String name;
     final LoxClass superclass;
-    private final Map<String, LoxFunction> methods;
-    LoxClass(String name,LoxClass superclass, Map<String, LoxFunction> methods){
+    protected final Map<String, LoxFunction> methods;
+    public LoxClass(String name,LoxClass superclass, Map<String, LoxFunction> methods){
         super(anyClass);
         this.name = name;
         this.methods = methods;

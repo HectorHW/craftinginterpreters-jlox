@@ -1,6 +1,8 @@
 
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.Predefs;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -253,12 +255,17 @@ public class LoxPredefined {
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 if(!(arguments.get(0) instanceof String)){
                     throw new RuntimeError(new Token(TokenType.IDENTIFIER, "import", null, -1),
-                        "arguments must be numbers.");
+                        "argument must be a string.");
                 }
 
                 String argument = (String)arguments.get(0);
 
                 String[] subparams = argument.split("\\.");
+
+                if(subparams.length==2 && subparams[0].equals("predef")){
+                    return Predefs.getPredef(subparams[1]);
+                }
+
                 if(subparams.length==1){
                     try{
                         return env.get(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1));

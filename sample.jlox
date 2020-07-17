@@ -16,3 +16,6 @@ var f = fun(){print a;};
 }
 a = "global2";
 f();
+
+var io = import("predef.StdIO")();
+io.println("abc");
