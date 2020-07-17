@@ -46,16 +46,16 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 if(!(arguments.get(0) instanceof Double)){
-                    throw new RuntimeError(paren,
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "sleep", null, -1),
                         "argument must be a number");
                 }
 
                 try {
                     long time = Math.round((double)arguments.get(0));
                     if(time<0){
-                        throw new RuntimeError(paren,
+                        throw new RuntimeError(new Token(TokenType.IDENTIFIER, "sleep", null, -1),
                             "time cannot be negative.");
                     }
                     Thread.sleep(time);
@@ -104,7 +104,7 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 try{
                     Scanner scanner =
                         (Scanner) interpreter.globals.getOrDefault(
@@ -113,7 +113,7 @@ public class LoxPredefined {
                     interpreter.globals.define("+StdIn+", scanner);
                     return scanner.nextLine();
                 }catch (InputMismatchException e){
-                    throw new RuntimeError(paren,
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readline", null, -1),
                         "failed to read with readline.");
                 }
             }
@@ -132,11 +132,11 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 try{
                     return Math.pow((Double) arguments.get(0), (Double)(arguments.get(1)));
                 }catch (ClassCastException e){
-                    throw new RuntimeError(paren,
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "pow", null, -1),
                         "arguments must be numbers.");
                 }
             }
@@ -209,12 +209,12 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 try{
                     LoxFunction ff = (LoxFunction)arguments.get(0);
                     return ff.arity();
                 }catch (ClassCastException e){
-                    throw new RuntimeError(paren,
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "arity", null, -1),
                         "arguments must be numbers.");
                 }
             }
@@ -233,9 +233,10 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 Object argument = arguments.get(0);
-                if(!interpreter.isTruthy(argument)) throw new RuntimeError(paren, "assertion error.");
+                if(!interpreter.isTruthy(argument)) throw new RuntimeError(new Token(TokenType.IDENTIFIER, "assert", null, -1),
+                    "assertion error.");
                 return argument;
             }
         });
@@ -249,9 +250,9 @@ public class LoxPredefined {
             }
 
             @Override
-            public Object call(Interpreter interpreter, List<Object> arguments, Token paren) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 if(!(arguments.get(0) instanceof String)){
-                    throw new RuntimeError(paren,
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "import", null, -1),
                         "arguments must be numbers.");
                 }
 
@@ -260,9 +261,9 @@ public class LoxPredefined {
                 String[] subparams = argument.split("\\.");
                 if(subparams.length==1){
                     try{
-                        return env.get(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line));
+                        return env.get(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1));
                     }catch (RuntimeError e){
-                        throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                        throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1),
                             "Failed to resolve name "+argument+".");
                     }
 
@@ -279,9 +280,9 @@ public class LoxPredefined {
 
                     if(interpreter.importer_files.containsKey(path)){
                         try{
-                            return interpreter.importer_files.get(path).get(new Token(TokenType.IDENTIFIER, fname, fname, paren.line));
+                            return interpreter.importer_files.get(path).get(new Token(TokenType.IDENTIFIER, fname, fname, -1));
                         }catch (RuntimeError e){
-                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1),
                                 "Failed to resolve name "+argument+".");
                         }
 
@@ -291,18 +292,18 @@ public class LoxPredefined {
                             res = executeForEnvironment(path);
 
                         }catch (IOException e){
-                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1),
                                 "Failed to find file "+path+" while importing.");
                         }catch (Parser.ParseError | Resolver.ResolveError | RuntimeError e){
-                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1),
                                 "Failed to execute file "+path+" while importing.");
                         }
 
                         interpreter.importer_files.put(path, res);
                         try{
-                            return res.get(new Token(TokenType.IDENTIFIER, fname, fname, paren.line));
+                            return res.get(new Token(TokenType.IDENTIFIER, fname, fname, -1));
                         }catch (RuntimeError e){
-                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], paren.line),
+                            throw new RuntimeError(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1),
                                 "Could not find name "+fname+" in file "+path+" while importing.");
                         }
 
