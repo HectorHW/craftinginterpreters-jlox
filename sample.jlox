@@ -1,18 +1,15 @@
-var s = 1;
-var start = clock();
-var math = import("other.Math");
-var finish = clock();
-print math;
-print math.pow(2,3);
+var FileIO = import("predef.FileIO");
+var file = FileIO("output.txt", "w");
+print file;
 
-print finish - start;
+var io = import("predef.StdIO")();
+print io;
+var s = io.readln();
+print io.readln;
+file.println(s);
+file.close();
 
-var a = "global";
-var f = fun(){print a;};
-{
-    var a = "local";
-    f();
-    print a;
-}
-a = "global2";
-f();
+var file = FileIO("output.txt", "r");
+var s2 = file.readln();
+file.close();
+io.println(s2);

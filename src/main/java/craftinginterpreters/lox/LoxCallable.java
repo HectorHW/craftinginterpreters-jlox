@@ -1,9 +1,10 @@
 package craftinginterpreters.lox;
 
 import java.util.List;
+import java.util.Set;
 
 public interface LoxCallable {
-    int arity();
+    Set<Integer>  arity();
 
     default Object call(Interpreter interpreter, List<Object> arguments){
         return call(interpreter, arguments, new Token(TokenType.LEFT_PAREN, "(", null, -1));

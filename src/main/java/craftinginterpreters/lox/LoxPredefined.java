@@ -1,13 +1,13 @@
 
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.Predefs;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 import java.util.Scanner;
 
 public class LoxPredefined {
@@ -27,7 +27,9 @@ public class LoxPredefined {
     static void defineClock(Environment env){
         env.define("clock", new LoxCallable() {
             @Override
-            public int arity() { return 0; }
+            public Set<Integer> arity() {
+                return Collections.singleton(0);
+            }
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
@@ -41,8 +43,8 @@ public class LoxPredefined {
     static void defineSleep(Environment env) {
         env.define("sleep", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
@@ -70,8 +72,8 @@ public class LoxPredefined {
     static void defineReadnum(Environment env){
         env.define("readnum", new LoxCallable() {
             @Override
-            public int arity() {
-                return 0;
+            public Set<Integer> arity() {
+                return Collections.singleton(0);
             }
 
             @Override
@@ -99,8 +101,8 @@ public class LoxPredefined {
     static void defineReadline(Environment env){
         env.define("readline", new LoxCallable() {
             @Override
-            public int arity() {
-                return 0;
+            public Set<Integer> arity() {
+                return Collections.singleton(0);
             }
 
             @Override
@@ -127,8 +129,8 @@ public class LoxPredefined {
     static void definePow(Environment env){
         env.define("pow", new LoxCallable() {
             @Override
-            public int arity() {
-                return 2;
+            public Set<Integer> arity() {
+                return Collections.singleton(2);
             }
 
             @Override
@@ -161,8 +163,8 @@ public class LoxPredefined {
     static void defineType(Environment env){
         env.define("type", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
@@ -204,8 +206,8 @@ public class LoxPredefined {
     static void defineArity(Environment env){
         env.define("arity", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
@@ -228,8 +230,8 @@ public class LoxPredefined {
     static void defineAssert(Environment env){
         env.define("assert", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
@@ -245,20 +247,25 @@ public class LoxPredefined {
     static void defineImport(Environment env){
         env.define("import", new LoxCallable() {
             @Override
-            public int arity() {
-                return 1;
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
             }
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 if(!(arguments.get(0) instanceof String)){
                     throw new RuntimeError(new Token(TokenType.IDENTIFIER, "import", null, -1),
-                        "arguments must be numbers.");
+                        "argument must be a string.");
                 }
 
                 String argument = (String)arguments.get(0);
 
                 String[] subparams = argument.split("\\.");
+
+                if(subparams.length==2 && subparams[0].equals("predef")){
+                    return Predefs.getPredef(subparams[1]);
+                }
+
                 if(subparams.length==1){
                     try{
                         return env.get(new Token(TokenType.IDENTIFIER, subparams[0], subparams[0], -1));

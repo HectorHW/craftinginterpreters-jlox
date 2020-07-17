@@ -1,15 +1,13 @@
 package craftinginterpreters.lox;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LoxClass extends LoxInstance implements LoxCallable{
-    static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
+    public static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
     final String name;
     final LoxClass superclass;
-    private final Map<String, LoxFunction> methods;
-    LoxClass(String name,LoxClass superclass, Map<String, LoxFunction> methods){
+    protected final Map<String, LoxCallable> methods;
+    public LoxClass(String name,LoxClass superclass, Map<String, LoxCallable> methods){
         super(anyClass);
         this.name = name;
         this.methods = methods;
@@ -22,9 +20,9 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     }
 
     @Override
-    public int arity() {
+    public Set<Integer> arity() {
         var initializer = findMethod("init");
-        if(initializer==null) return 0;
+        if(initializer==null) return Collections.singleton(0);
         return initializer.arity();
     }
 
@@ -32,7 +30,7 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     public Object call(Interpreter interpreter, List<Object> arguments) {
         LoxInstance instance = new LoxInstance(this);
 
-        var initializer = findMethod("init");
+        var initializer = (LoxFunction)findMethod("init");
         if(initializer!=null){
             initializer.bind(instance).call(interpreter, arguments);
         }
@@ -40,7 +38,7 @@ public class LoxClass extends LoxInstance implements LoxCallable{
         return instance;
     }
 
-    LoxFunction findMethod(String name){
+    public LoxCallable findMethod(String name){
         if(methods.containsKey(name)) return methods.get(name);
         if(superclass!=null) return superclass.findMethod(name);
 
@@ -48,7 +46,7 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     }
 
     @Override
-    Object get(Token name){
+    public Object get(Token name){
         Object method = this.findMethod(name.lexeme);
         if(method!=null) return method;
         throw new RuntimeError(name, "Undefined property '"+name.lexeme+"'.");
