@@ -4,11 +4,10 @@ import craftinginterpreters.lox.*;
 import java.util.*;
 import java.util.Scanner;
 
-public class StdIO extends LoxClass {
+public class StdIO extends NativeLoxClass {
 
-    public static final StdIO instance = new StdIO();
 
-    static class StdIoInstance extends LoxInstance{
+    static class StdIoInstance extends NativeLoxInstance{
         protected final java.util.Scanner scanner = new java.util.Scanner(System.in);
         protected StdIoInstance(StdIO classInstance){
             super(classInstance);
@@ -20,11 +19,11 @@ public class StdIO extends LoxClass {
     }
 
     public static LoxClass getInstance(){
-        return instance;
+        return new StdIO();
     }
 
-    private void define_methods(StdIoInstance instance){
-        instance.fields.put("readNum", new LoxCallable() {
+    private void define_methods(StdIO classinstance, StdIoInstance instance){
+        classinstance.methods.put("readnum", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -47,7 +46,7 @@ public class StdIO extends LoxClass {
             }
         });
 
-        instance.fields.put("readLine", new LoxCallable() {
+        classinstance.methods.put("readln", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -59,7 +58,7 @@ public class StdIO extends LoxClass {
                     Scanner scanner = instance.scanner;
                     return scanner.nextLine();
                 }catch (InputMismatchException e){
-                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readline", null, -1),
+                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readln", null, -1),
                         "failed to read with readline.");
                 }
             }
@@ -69,7 +68,7 @@ public class StdIO extends LoxClass {
             }
         });
 
-        instance.fields.put("print", new LoxCallable() {
+        classinstance.methods.put("print", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -83,7 +82,7 @@ public class StdIO extends LoxClass {
             }
         });
 
-        instance.fields.put("println", new LoxCallable() {
+        classinstance.methods.put("println", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -107,7 +106,7 @@ public class StdIO extends LoxClass {
     public Object call(Interpreter interpreter, List<Object> arguments) {
 
         var instance = new StdIoInstance(this);
-        define_methods(instance);
+        define_methods(this, instance);
         return instance;
     }
 }

@@ -15,12 +15,20 @@ public class Environment {
         this.enclosing = enclosing;
     }
 
-    Object get(Token name){
+    public Object get(Token name){
         if(values.containsKey(name.lexeme)){
             return values.get(name.lexeme);
         }
         if(enclosing!=null) return enclosing.get(name);
         throw new RuntimeError(name, "Undefined variable `"+name.lexeme+"`.");
+    }
+
+    public Object get(String name){
+        if(values.containsKey(name)){
+            return values.get(name);
+        }
+        if(enclosing!=null) return enclosing.get(name);
+        throw new RuntimeError(new Token(TokenType.IDENTIFIER, name, null, -1), "Undefined variable `"+name+"`.");
     }
 
     void assign(Token name, Object value){

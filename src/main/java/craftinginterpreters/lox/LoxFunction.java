@@ -6,9 +6,9 @@ import java.util.Set;
 
 public class LoxFunction implements LoxCallable {
     private final Stmt.Function declaration;
-    private final Environment closure;
+    public final Environment closure;
     private final boolean isInitializer;
-    LoxFunction(Stmt.Function declaration, Environment closure, boolean isInitializer){
+    protected LoxFunction(Stmt.Function declaration, Environment closure, boolean isInitializer){
         this.declaration = declaration;
         this.closure = closure;
         this.isInitializer = isInitializer;

@@ -1,5 +1,7 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.NativeLoxInstance;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -243,6 +245,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Object visitCallExpr(Expr.Call expr) {
+        //System.out.println(expr.paren.line);
         Object callee = evaluate(expr.calee);
 
         List<Object> arguments = new ArrayList<>();
@@ -252,7 +255,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         if(!(callee instanceof LoxCallable)){
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
-        LoxCallable function = (LoxCallable)callee;
+        LoxCallable function = (LoxCallable) callee;
+        //System.out.println(function);
         if(!function.arity().contains(arguments.size()))
             {
             throw new RuntimeError(expr.paren,
@@ -272,6 +276,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Object visitGetExpr(Expr.Get expr) {
         Object object = evaluate(expr.object);
+        if(object instanceof NativeLoxInstance){
+            return ((NativeLoxInstance)object).get(expr.name);
+        }
         if(object instanceof  LoxInstance){
             return ((LoxInstance)object).get(expr.name);
         }
@@ -317,7 +324,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             environment.define("super", superclass);
         }
 
-        Map<String, LoxFunction> methods = new HashMap<>();
+        Map<String, LoxCallable> methods = new HashMap<>();
         for(var method : stmt.methods){
             var function = new LoxFunction(method, environment, method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme, function);
@@ -393,7 +400,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         Object object = evaluate(expr.object);
         if(!(object instanceof LoxInstance)) throw new RuntimeError(expr.name, "Only instances have fields.");
         Object value = evaluate(expr.value);
-        ((LoxInstance)object).set(expr.name, value);
+        if(object instanceof NativeLoxInstance){
+            ((NativeLoxInstance)object).set(expr.name, value);
+        }else{
+            ((LoxInstance)object).set(expr.name, value);
+        }
+
         return value;
     }
 
@@ -412,7 +424,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         if(method==null){
             throw new RuntimeError(expr.method, "Undefined property `"+expr.method.lexeme+"`.");
         }
-        return method.bind(object);
+        return ((LoxFunction)method).bind(object);
     }
 
     @Override

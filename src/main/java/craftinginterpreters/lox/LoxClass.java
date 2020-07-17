@@ -6,8 +6,8 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     public static final LoxClass anyClass = new LoxClass("any", null, new HashMap<>());
     final String name;
     final LoxClass superclass;
-    protected final Map<String, LoxFunction> methods;
-    public LoxClass(String name,LoxClass superclass, Map<String, LoxFunction> methods){
+    protected final Map<String, LoxCallable> methods;
+    public LoxClass(String name,LoxClass superclass, Map<String, LoxCallable> methods){
         super(anyClass);
         this.name = name;
         this.methods = methods;
@@ -30,7 +30,7 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     public Object call(Interpreter interpreter, List<Object> arguments) {
         LoxInstance instance = new LoxInstance(this);
 
-        var initializer = findMethod("init");
+        var initializer = (LoxFunction)findMethod("init");
         if(initializer!=null){
             initializer.bind(instance).call(interpreter, arguments);
         }
@@ -38,7 +38,7 @@ public class LoxClass extends LoxInstance implements LoxCallable{
         return instance;
     }
 
-    LoxFunction findMethod(String name){
+    public LoxCallable findMethod(String name){
         if(methods.containsKey(name)) return methods.get(name);
         if(superclass!=null) return superclass.findMethod(name);
 
@@ -46,7 +46,7 @@ public class LoxClass extends LoxInstance implements LoxCallable{
     }
 
     @Override
-    Object get(Token name){
+    public Object get(Token name){
         Object method = this.findMethod(name.lexeme);
         if(method!=null) return method;
         throw new RuntimeError(name, "Undefined property '"+name.lexeme+"'.");
