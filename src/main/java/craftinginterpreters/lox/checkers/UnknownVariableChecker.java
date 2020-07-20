@@ -2,6 +2,7 @@ package craftinginterpreters.lox.checkers;
 
 import craftinginterpreters.lox.Expr;
 import craftinginterpreters.lox.Lox;
+import craftinginterpreters.lox.LoxPredefined;
 import craftinginterpreters.lox.Token;
 
 import java.util.HashMap;
@@ -45,6 +46,7 @@ public class UnknownVariableChecker extends UnusedVariableChecker{
             }
         }
         if(globals.containsKey(variableName.lexeme)) return null;
+        if(LoxPredefined.predefined_names.contains(variableName.lexeme)) return null;
         Lox.warning(variableName, "variable reference without prior declaration is deprecated");
         return null;
     }

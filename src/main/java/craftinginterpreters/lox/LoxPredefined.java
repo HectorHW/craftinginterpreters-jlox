@@ -11,6 +11,18 @@ import java.util.*;
 import java.util.Scanner;
 
 public class LoxPredefined {
+
+    public static HashSet<String> predefined_names = new HashSet<>();
+    static {
+        predefined_names.add("clock");
+        predefined_names.add("sleep");
+        predefined_names.add("type");
+        predefined_names.add("arity");
+        predefined_names.add("assert");
+        predefined_names.add("import");
+
+    }
+
     static void bake(Interpreter interpreter){
         defineClock(interpreter.globals);
         defineSleep(interpreter.globals);
