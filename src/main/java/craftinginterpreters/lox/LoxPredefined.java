@@ -1,6 +1,9 @@
 
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.NativeLoxClass;
+import craftinginterpreters.lox.predefs.NativeLoxFunction;
+import craftinginterpreters.lox.predefs.NativeLoxInstance;
 import craftinginterpreters.lox.predefs.Predefs;
 
 import java.io.IOException;
@@ -33,7 +36,7 @@ public class LoxPredefined {
     }
 
     static void defineClock(Environment env){
-        env.define("clock", new LoxCallable() {
+        env.define("clock", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -49,7 +52,7 @@ public class LoxPredefined {
     }
 
     static void defineSleep(Environment env) {
-        env.define("sleep", new LoxCallable() {
+        env.define("sleep", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -89,7 +92,7 @@ public class LoxPredefined {
     }
 
     static void defineType(Environment env){
-        env.define("type", new LoxCallable() {
+        env.define("type", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -108,6 +111,9 @@ public class LoxPredefined {
                     return env.get(new Token(TokenType.IDENTIFIER, "Class", null, -1));
                 }
                 if(argument instanceof LoxFunction){
+                    return env.get(new Token(TokenType.IDENTIFIER, "Function", null, -1));
+                }
+                if(argument instanceof NativeLoxFunction){
                     return env.get(new Token(TokenType.IDENTIFIER, "Function", null, -1));
                 }
                 if(argument instanceof LoxInstance){
@@ -132,7 +138,7 @@ public class LoxPredefined {
     }
 
     static void defineArity(Environment env){
-        env.define("arity", new LoxCallable() {
+        env.define("arity", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -156,7 +162,7 @@ public class LoxPredefined {
     }
 
     static void defineAssert(Environment env){
-        env.define("assert", new LoxCallable() {
+        env.define("assert", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -173,7 +179,7 @@ public class LoxPredefined {
     }
 
     static void defineImport(Environment env){
-        env.define("import", new LoxCallable() {
+        env.define("import", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
