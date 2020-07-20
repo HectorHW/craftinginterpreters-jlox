@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Stack;
 
 public class UnusedVariableChecker extends BaseChecker{
-    private final Stack<Map<String, Token>> scopes = new Stack<>();
+    protected final Stack<Map<String, Token>> scopes = new Stack<>();
 
     @Override
     public Void visitBlockStmt(Stmt.Block stmt){
@@ -17,11 +17,11 @@ public class UnusedVariableChecker extends BaseChecker{
         return null;
     }
 
-    private void beginScope(){
+    protected void beginScope(){
         scopes.push(new HashMap<>());
     }
 
-    private void endScope(){
+    protected void endScope(){
         for(var record : scopes.peek().entrySet()){
             if(record.getValue()!=null
                 && !record.getKey().equals("this")
@@ -52,7 +52,7 @@ public class UnusedVariableChecker extends BaseChecker{
         return null;
     }
 
-    private void declare(Token name){
+    protected void declare(Token name){
         if (scopes.isEmpty()) return; //не проверяем глобальные имена
         var scope = scopes.peek();
         scope.put(name.lexeme, name);

@@ -9,5 +9,6 @@ public class CheckExecutor {
         new ReturnChecker().resolve(statements);
         new BreakContinueChecker().resolve(statements);
         new UnusedVariableChecker().resolve(statements);
+        new UnknownVariableChecker().resolve(statements);
     }
 }
