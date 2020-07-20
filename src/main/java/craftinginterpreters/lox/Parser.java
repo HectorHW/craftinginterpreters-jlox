@@ -118,7 +118,7 @@ public class Parser {
                     error(peek(), "Cannot have more than 255 parameters.");
                 }
                 parameters.add(consume(IDENTIFIER, "Expected parameter name."));
-            }while(match(COMMA));
+            }while(peek().type != RIGHT_PAREN);
         }
         consume(RIGHT_PAREN, "Expect `)` after parameters.");
 
@@ -314,7 +314,7 @@ public class Parser {
                         error(peek(), "Cannot have more than 255 parameters.");
                     }
                     parameters.add(consume(IDENTIFIER, "Expected parameter name."));
-                }while(match(COMMA));
+                }while(peek().type!=RIGHT_PAREN);
             }
             consume(RIGHT_PAREN, "Expect `)` after parameters.");
 
@@ -425,7 +425,7 @@ public class Parser {
                     error(peek(), "Cannot have more than 255 arguments.");
                 }
                 arguments.add(ternary_operator());
-            }while(match(COMMA)); //,b,c...
+            }while(peek().type!=RIGHT_PAREN); //,b,c...
         }
         Token paren = consume(RIGHT_PAREN, "Expect `)` after argument list.");
         return new Expr.Call(calee, paren, arguments);
