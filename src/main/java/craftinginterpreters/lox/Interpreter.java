@@ -1,5 +1,6 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.NativeLoxFunction;
 import craftinginterpreters.lox.predefs.NativeLoxInstance;
 
 import java.util.*;
@@ -170,19 +171,30 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     Object callSpecialMethod(LoxInstance object, String methodName, Object right, Expr.Binary expr){
         Object f;
         try{
-            f = object.get(new Token(TokenType.IDENTIFIER, "plus_", null, expr.operator.line));
+            f = object.get(new Token(TokenType.IDENTIFIER, methodName, null, expr.operator.line));
         }catch (RuntimeError ignored){
             throw new RuntimeError(expr.operator,
                 "failed to find special method "+methodName+" on left operand.");
         }
        if(f instanceof LoxFunction){
+           System.out.println(1);
             LoxFunction ff = (LoxFunction)f;
             if(!ff.arity().equals(Collections.singleton(1))){
                 throw new RuntimeError(expr.operator,
                     "wrong arity of special method "+methodName+" on left operand.");
             }
             return ff.call(this, Collections.singletonList(right));
-        }else{
+        }
+       else if(f instanceof NativeLoxFunction){
+           NativeLoxFunction ff = (NativeLoxFunction)f;
+           if(!ff.arity().equals(Collections.singleton(1))){
+               throw new RuntimeError(expr.operator,
+                   "wrong arity of special method "+methodName+" on left operand.");
+           }
+           return ff.call(this, Collections.singletonList(right));
+       }
+
+       else{
            throw new RuntimeError(expr.operator,
                methodName+" is not method");
        }

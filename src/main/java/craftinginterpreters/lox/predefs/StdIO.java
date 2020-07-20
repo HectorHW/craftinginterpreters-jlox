@@ -24,7 +24,7 @@ public class StdIO extends NativeLoxClass {
     }
 
     private void define_methods(StdIO classinstance, StdIoInstance instance){
-        classinstance.methods.put("readnum", new NativeLoxFunction() {
+        instance.fields.put("readnum", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -47,7 +47,7 @@ public class StdIO extends NativeLoxClass {
             }
         });
 
-        classinstance.methods.put("readln", new NativeLoxFunction() {
+        instance.fields.put("readln", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -69,7 +69,7 @@ public class StdIO extends NativeLoxClass {
             }
         });
 
-        classinstance.methods.put("print", new NativeLoxFunction() {
+        instance.fields.put("print", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -83,7 +83,7 @@ public class StdIO extends NativeLoxClass {
             }
         });
 
-        classinstance.methods.put("println", new NativeLoxFunction() {
+        instance.fields.put("println", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);

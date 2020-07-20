@@ -15,7 +15,7 @@ public class LoxInstance {
         return loxClass.name + " instance";
     }
 
-    Object get(Token name){
+    public Object get(Token name){
         if(fields.containsKey(name.lexeme)) return fields.get(name.lexeme);
         var method = loxClass.findMethod(name.lexeme);
         if(method!=null) return ((LoxFunction)method).bind(this);

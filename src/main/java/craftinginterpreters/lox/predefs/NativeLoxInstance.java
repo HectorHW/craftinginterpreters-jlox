@@ -8,6 +8,7 @@ public abstract class NativeLoxInstance extends LoxInstance {
         super(loxClass);
     }
 
+    @Override
     public Object get(Token name){
         if(fields.containsKey(name.lexeme)) return fields.get(name.lexeme);
         var method = loxClass.findMethod(name.lexeme);

@@ -53,7 +53,7 @@ public class FileIO extends NativeLoxClass {
 
     private void define_methods(FileIO classinstance, FileIoInstance objectinstance){
 
-        classinstance.methods.put("getMode", new NativeLoxFunction() {
+        objectinstance.fields.put("getMode", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -74,7 +74,7 @@ public class FileIO extends NativeLoxClass {
         });
 
 
-        classinstance.methods.put("close", new NativeLoxFunction() {
+        objectinstance.fields.put("close", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
@@ -95,7 +95,7 @@ public class FileIO extends NativeLoxClass {
             }
         });
 
-        classinstance.methods.put("print", new NativeLoxFunction() {
+        objectinstance.fields.put("print", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(1);
@@ -117,7 +117,7 @@ public class FileIO extends NativeLoxClass {
             }
         });
 
-        classinstance.methods.put("println", new NativeLoxFunction() {
+        objectinstance.fields.put("println", new NativeLoxFunction() {
 
             @Override
             public Set<Integer> arity() {
@@ -141,7 +141,7 @@ public class FileIO extends NativeLoxClass {
             }
         });
 
-        classinstance.methods.put("readln", new NativeLoxFunction() {
+        objectinstance.fields.put("readln", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
                 return Collections.singleton(0);
