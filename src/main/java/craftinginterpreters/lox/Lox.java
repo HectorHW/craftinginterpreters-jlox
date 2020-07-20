@@ -171,7 +171,7 @@ public class Lox {
         if(token.type == TokenType.EOF){
             System.out.printf("at the end: warning: %s\n", message);
         }else{
-            System.out.printf("[line %d] warning: %s\n", token.line, message);
+            System.out.printf("[line %d] warning at `%s`: %s\n", token.line, token.lexeme, message);
         }
     }
 
