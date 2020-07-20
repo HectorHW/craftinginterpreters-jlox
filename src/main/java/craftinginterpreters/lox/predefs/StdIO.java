@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 public class StdIO extends NativeLoxClass {
 
+    private static StdIO classInstance = new StdIO();
 
     static class StdIoInstance extends NativeLoxInstance{
         protected final java.util.Scanner scanner = new java.util.Scanner(System.in);
@@ -19,7 +20,7 @@ public class StdIO extends NativeLoxClass {
     }
 
     public static LoxClass getInstance(){
-        return new StdIO();
+        return classInstance;
     }
 
     private void define_methods(StdIO classinstance, StdIoInstance instance){

@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 public class FileIO extends NativeLoxClass {
 
+    private static FileIO classInstance = new FileIO();
+
     static class FileIoInstance extends NativeLoxInstance{
 
         enum FileIOMode{
@@ -46,7 +48,7 @@ public class FileIO extends NativeLoxClass {
     }
 
     public static LoxClass getInstance(){
-        return new FileIO();
+        return classInstance;
     }
 
     private void define_methods(FileIO classinstance, FileIoInstance objectinstance){
