@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.Scanner;
 
 public class LoxPredefined {
 
@@ -26,9 +25,6 @@ public class LoxPredefined {
     static void bake(Interpreter interpreter){
         defineClock(interpreter.globals);
         defineSleep(interpreter.globals);
-        defineReadnum(interpreter.globals);
-        defineReadline(interpreter.globals);
-        definePow(interpreter.globals);
         defineClasses(interpreter.globals);
         defineType(interpreter.globals);
         defineArity(interpreter.globals);
@@ -78,86 +74,6 @@ public class LoxPredefined {
             }
             @Override
             public String toString(){return "<native fn>";}
-        });
-    }
-
-    static void defineReadnum(Environment env){
-        env.define("readnum", new LoxCallable() {
-            @Override
-            public Set<Integer> arity() {
-                return Collections.singleton(0);
-            }
-
-            @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
-                try{
-                    Scanner scanner =
-                        (Scanner) interpreter.globals.getOrDefault(
-                            new Token(TokenType.IDENTIFIER, "+StdIn+", null, -1),
-                            new java.util.Scanner(System.in));
-                    interpreter.globals.define("+StdIn+", scanner);
-                    return scanner.nextDouble();
-                }catch (InputMismatchException e){
-                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readnum", null, -1),
-                        "failed to read number with readnum.");
-                }
-            }
-
-            @Override
-            public String toString(){
-                return "<native fn>";
-            }
-        });
-    }
-
-    static void defineReadline(Environment env){
-        env.define("readline", new LoxCallable() {
-            @Override
-            public Set<Integer> arity() {
-                return Collections.singleton(0);
-            }
-
-            @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
-                try{
-                    Scanner scanner =
-                        (Scanner) interpreter.globals.getOrDefault(
-                            new Token(TokenType.IDENTIFIER, "+StdIn+", null, -1),
-                            new java.util.Scanner(System.in));
-                    interpreter.globals.define("+StdIn+", scanner);
-                    return scanner.nextLine();
-                }catch (InputMismatchException e){
-                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readline", null, -1),
-                        "failed to read with readline.");
-                }
-            }
-            @Override
-            public String toString(){
-                return "<native fn>";
-            }
-        });
-    }
-
-    static void definePow(Environment env){
-        env.define("pow", new LoxCallable() {
-            @Override
-            public Set<Integer> arity() {
-                return Collections.singleton(2);
-            }
-
-            @Override
-            public Object call(Interpreter interpreter, List<Object> arguments) {
-                try{
-                    return Math.pow((Double) arguments.get(0), (Double)(arguments.get(1)));
-                }catch (ClassCastException e){
-                    throw new RuntimeError(new Token(TokenType.IDENTIFIER, "pow", null, -1),
-                        "arguments must be numbers.");
-                }
-            }
-            @Override
-            public String toString(){
-                return "<native fn>";
-            }
         });
     }
     
