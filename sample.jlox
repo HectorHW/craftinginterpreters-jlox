@@ -13,3 +13,8 @@ var file = FileIO("output.txt", "r");
 var s2 = file.readln();
 file.close();
 io.println(s2);
+
+var f = def(){
+    return 1;
+};
+print f();

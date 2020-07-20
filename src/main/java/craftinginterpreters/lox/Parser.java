@@ -39,8 +39,8 @@ public class Parser {
 
     private Stmt declaration(){
         try{
-            if(check(FUN)&&checkNext(IDENTIFIER)){
-                match(FUN);
+            if(check(DEF)&&checkNext(IDENTIFIER)){
+                match(DEF);
                 return function("function");
             }
             if(match(CLASS)) return classDeclaration();
@@ -305,7 +305,7 @@ public class Parser {
     }
 
     private Expr anonFunction(){
-        if(match(FUN)){
+        if(match(DEF)){
             consume(LEFT_PAREN, "Expected `(` after anon function definition");
             List<Token> parameters = new ArrayList<>();
             if(!check(RIGHT_PAREN)){
@@ -513,7 +513,7 @@ public class Parser {
         while(!isAtEnd()){
             if (previous().type==SEMICOLON) return;
             switch (peek().type){
-                case CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN -> {return;}
+                case CLASS, DEF, VAR, FOR, IF, WHILE, PRINT, RETURN -> {return;}
             }
             advance();
         }

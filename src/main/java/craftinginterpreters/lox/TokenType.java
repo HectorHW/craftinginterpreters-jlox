@@ -17,7 +17,7 @@ public enum TokenType {
     IDENTIFIER, STRING, NUMBER,
 
     //зарезервированные ключевые слова
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
+    AND, CLASS, ELSE, FALSE, DEF, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
     BREAK, CONTINUE, STATIC,
 
