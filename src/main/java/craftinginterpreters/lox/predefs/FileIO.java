@@ -62,8 +62,8 @@ public class FileIO extends NativeLoxClass {
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 return switch (objectinstance.mode){
-                    case READ -> "r";
-                    case WRITE -> "w";
+                    case READ -> new LoxString.LoxStringInstance("r");
+                    case WRITE -> new LoxString.LoxStringInstance("w");
                 };
             }
 
@@ -170,8 +170,8 @@ public class FileIO extends NativeLoxClass {
 
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
-        if(arguments.get(0) instanceof String && arguments.get(1) instanceof String){
-            var fileIoInstance = new FileIoInstance(this, (String) arguments.get(0), (String) arguments.get(1));
+        if(arguments.get(0) instanceof LoxString.LoxStringInstance && arguments.get(1) instanceof LoxString.LoxStringInstance){
+            var fileIoInstance = new FileIoInstance(this, arguments.get(0).toString(), arguments.get(1).toString());
             define_methods(this, fileIoInstance);
             return fileIoInstance;
         }else{

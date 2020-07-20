@@ -1,5 +1,7 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.LoxString;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -153,7 +155,7 @@ public class Scanner {
 
         advance(); // пропускаем закрывающую "
         var value = source.substring(start+1, current-1); //не включая ""
-        addToken(STRING, value);
+        addToken(STRING, new LoxString.LoxStringInstance(value));
     }
 
     private boolean match(char expected){ //проверка на совпадение следующего символа при формировании токена

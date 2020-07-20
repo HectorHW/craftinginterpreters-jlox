@@ -1,10 +1,7 @@
 
 package craftinginterpreters.lox;
 
-import craftinginterpreters.lox.predefs.NativeLoxClass;
-import craftinginterpreters.lox.predefs.NativeLoxFunction;
-import craftinginterpreters.lox.predefs.NativeLoxInstance;
-import craftinginterpreters.lox.predefs.Predefs;
+import craftinginterpreters.lox.predefs.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -187,12 +184,12 @@ public class LoxPredefined {
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                if(!(arguments.get(0) instanceof String)){
+                if(!(arguments.get(0) instanceof LoxString.LoxStringInstance)){
                     throw new RuntimeError(new Token(TokenType.IDENTIFIER, "import", null, -1),
                         "argument must be a string.");
                 }
 
-                String argument = (String)arguments.get(0);
+                String argument = arguments.get(0).toString();
 
                 String[] subparams = argument.split("\\.");
 
