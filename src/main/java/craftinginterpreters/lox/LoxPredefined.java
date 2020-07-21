@@ -78,8 +78,6 @@ public class LoxPredefined {
     }
     
     static void defineClasses(Environment env) {
-        env.define("String", new LoxClass("String", LoxClass.anyClass, new HashMap<>()));
-        env.define("Number", new LoxClass("Number", LoxClass.anyClass, new HashMap<>()));
         env.define("Class", LoxClass.anyClass);
         env.define("Function", new LoxClass("Function", LoxClass.anyClass, new HashMap<>()));
         env.define("Object", new LoxClass("Object", LoxClass.anyClass, new HashMap<>()));

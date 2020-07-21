@@ -1,5 +1,6 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.LoxNumber;
 import craftinginterpreters.lox.predefs.LoxString;
 
 import java.util.ArrayList;
@@ -138,8 +139,8 @@ public class Scanner {
             advance(); //пропутим точку
             while (isDigit(peek())) advance(); //и оставшуюся часть числа
         }
-
-        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+        var value = source.substring(start, current);
+        addToken(NUMBER, new LoxNumber.LoxNumberInstance(Double.parseDouble(value)));
     }
 
     private void string(){
