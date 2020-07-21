@@ -1,9 +1,11 @@
 package craftinginterpreters.lox.predefs;
 
-import craftinginterpreters.lox.Interpreter;
-import craftinginterpreters.lox.LoxClass;
+import craftinginterpreters.lox.*;
 
 import java.util.*;
+
+import static craftinginterpreters.lox.predefs.Predefs.Arities.*;
+import static craftinginterpreters.lox.predefs.Predefs.requireType;
 
 public class LoxNumber extends NativeLoxClass{
     private static final LoxNumber classInstance = new LoxNumber();
@@ -39,12 +41,167 @@ public class LoxNumber extends NativeLoxClass{
     }
 
     static void define_methods(LoxNumber classInstance, LoxNumberInstance instance){
-        //TODO
+        instance.fields.put("plus_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected String or Number", LoxString.getInstance(), LoxNumber.getInstance());
+                LoxInstance argument = (LoxInstance)arguments.get(0);
+                if(argument instanceof LoxString.LoxStringInstance){
+                    return new LoxString.LoxStringInstance(instance.toString()+((LoxString.LoxStringInstance) argument).data);
+                }else if(argument instanceof LoxNumber.LoxNumberInstance){
+                    return new LoxNumberInstance(instance.data+((LoxNumberInstance) argument).data);
+                }
+                return null;
+            }
+        });
+
+        instance.fields.put("minus_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                return new LoxNumberInstance(instance.data-argument.data);
+            }
+        });
+
+        instance.fields.put("star_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                return new LoxNumberInstance(instance.data*argument.data);
+            }
+        });
+
+        instance.fields.put("slash_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                if(argument.data==0.0) throw new RuntimeError(
+                    new Token(TokenType.SLASH, "/", null, -1), "Zero division");
+                return new LoxNumberInstance(instance.data/argument.data);
+            }
+        });
+
+        instance.fields.put("g_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                return instance.data>argument.data;
+            }
+        });
+
+        instance.fields.put("ge_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                return instance.data>=argument.data;
+            }
+        });
+
+        instance.fields.put("l_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                return instance.data<argument.data;
+            }
+        });
+
+        instance.fields.put("le_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ONE_ARGUMENT;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                requireType(arguments.get(0), "expected Number", LoxNumber.getInstance());
+                var argument = (LoxNumberInstance)arguments.get(0);
+                return instance.data<=argument.data;
+            }
+        });
+
+        instance.fields.put("String_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ZERO_ARGUMENTS;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return new LoxString.LoxStringInstance(String.valueOf(instance.data));
+            }
+        });
+
+        instance.fields.put("Number_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ZERO_ARGUMENTS;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return instance;
+            }
+        });
+
+        instance.fields.put("Boolean_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ZERO_ARGUMENTS;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return instance.data!=0.0 && !Double.isNaN(instance.data);
+            }
+        });
+
+
     }
 
     @Override
     public Set<Integer> arity() {
-        return Collections.singleton(1);
+        return ONE_ARGUMENT;
     }
 
     @Override

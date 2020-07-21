@@ -2,6 +2,9 @@ package craftinginterpreters.lox.predefs;
 
 import craftinginterpreters.lox.*;
 
+import java.util.Collections;
+import java.util.Set;
+
 public class Predefs {
 
     public static Object getPredef(String name){
@@ -27,5 +30,11 @@ public class Predefs {
         }
 
         throw new RuntimeError(new Token(TokenType.IDENTIFIER, "typing", null, -1), error);
+    }
+
+    public static class Arities{
+        public static Set<Integer> ZERO_ARGUMENTS = Collections.singleton(0);
+        public static Set<Integer> ONE_ARGUMENT = Collections.singleton(1);
+        public static Set<Integer> TWO_ARGUMENTS = Collections.singleton(2);
     }
 }
