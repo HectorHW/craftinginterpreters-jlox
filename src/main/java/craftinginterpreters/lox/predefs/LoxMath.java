@@ -2,12 +2,10 @@ package craftinginterpreters.lox.predefs;
 
 import craftinginterpreters.lox.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
-import static craftinginterpreters.lox.predefs.Predefs.Arities.*;
-
 
 public class LoxMath extends NativeLoxClass {
     private static LoxMath classInstance = new LoxMath();
@@ -21,18 +19,19 @@ public class LoxMath extends NativeLoxClass {
         classInstance.fields.put("pow", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
-                return TWO_ARGUMENTS;
+                return Collections.singleton(2);
             }
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Object argument1 = arguments.get(0);
                 Object argument2 = arguments.get(1);
-                Predefs.requireType(argument1, "Number expected", LoxNumber.getInstance());
-                Predefs.requireType(argument2, "Number expected", LoxNumber.getInstance());
-                return new LoxNumber.LoxNumberInstance(
-                    Math.pow(((LoxNumber.LoxNumberInstance)argument1).data, ((LoxNumber.LoxNumberInstance)argument2).data)
-                );
+
+                if(argument1 instanceof Double && argument2 instanceof Double){
+                    return Math.pow((Double)argument1, (Double)argument2);
+                }
+                throw new RuntimeError(new Token(TokenType.IDENTIFIER, "pow", null, -1),
+                    "argments must be numbers");
             }
         });
     }
@@ -40,7 +39,7 @@ public class LoxMath extends NativeLoxClass {
 
     @Override
     public Set<Integer> arity() {
-        return ZERO_ARGUMENTS;
+        return Collections.singleton(0);
     }
 
     @Override

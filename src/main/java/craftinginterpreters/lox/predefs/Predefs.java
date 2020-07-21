@@ -7,6 +7,7 @@ public class Predefs {
     public static Object getPredef(String name){
         if(name.equals("StdIO")) return StdIO.getInstance();
         if(name.equals("FileIO")) return FileIO.getInstance();
+        if(name.equals("Math")) return LoxMath.getInstance();
         throw new RuntimeError(new Token(TokenType.IDENTIFIER, name, null, -1), "unknown predefined object.");
     }
 
