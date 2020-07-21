@@ -81,7 +81,7 @@ public class LoxPredefined {
         env.define("Class", LoxClass.anyClass);
         env.define("Function", new LoxClass("Function", LoxClass.anyClass, new HashMap<>()));
         env.define("Object", new LoxClass("Object", LoxClass.anyClass, new HashMap<>()));
-        env.define("Boolean", new LoxClass("Boolean", LoxClass.anyClass, new HashMap<>()));
+        //env.define("Boolean", new LoxClass("Boolean", LoxClass.anyClass, new HashMap<>()));
         env.define("Nil", new LoxClass("Nil", LoxClass.anyClass, new HashMap<>()));
 
     }

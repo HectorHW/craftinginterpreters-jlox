@@ -1,5 +1,6 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.LoxBoolean;
 import craftinginterpreters.lox.predefs.NativeLoxFunction;
 import craftinginterpreters.lox.predefs.NativeLoxInstance;
 
@@ -156,8 +157,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 throw new RuntimeError(expr.operator,
                     "Operands must be two numbers or two strings");
 
-            case BANG_EQUAL: return !isEqual(left, right);
-            case EQUAL_EQUAL: return isEqual(left, right);
+            case BANG_EQUAL: return LoxBoolean.LoxBooleanInstance.equality(left, right).not();
+            case EQUAL_EQUAL: return LoxBoolean.LoxBooleanInstance.equality(left, right);
 
             case COMMA:
                 return right;
@@ -371,6 +372,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         }
         if(object instanceof String){
             return !"".equals(object);
+        }
+        if(object instanceof LoxBoolean.LoxBooleanInstance){
+            return ((LoxBoolean.LoxBooleanInstance) object).value;
         }
         return true; // для ввсех остальных объектов положим true
     }

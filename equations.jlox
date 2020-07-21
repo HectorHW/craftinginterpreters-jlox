@@ -1,9 +1,15 @@
+var io = import("predef.StdIO")();
+var pow = import("predef.Math").pow;
 print "введите коэффициенты квадратного уравнения";
-var a = readnum();
-var b = readnum();
-var c = readnum();
-
-fun binom(b, c){
+var a = io.readnum();
+var b = io.readnum();
+var c = io.readnum();
+print a;
+print 0;
+//print type(0);
+print type(0)==type(a);
+print type(a);
+def binom(b, c){
 if(b==0){
         if(c==0){
             print "все коэффициенты нулевые, решением является любой x";
@@ -17,7 +23,7 @@ if(b==0){
     print x;
     }
 }
-fun trinom(a,b,c){
+def trinom(a,b,c){
     var D = pow(b, 2)-4*a*c;
     if(D<0){
         print "дискрименант <0, нет корней";

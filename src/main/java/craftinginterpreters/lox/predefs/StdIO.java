@@ -34,7 +34,7 @@ public class StdIO extends NativeLoxClass {
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 try{
                     java.util.Scanner scanner = instance.scanner;
-                    return scanner.nextDouble();
+                    return new LoxNumber.LoxNumberInstance(scanner.nextDouble());
                 }catch (InputMismatchException e){
                     throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readnum", null, -1),
                         "failed to read number with readnum.");
@@ -57,7 +57,7 @@ public class StdIO extends NativeLoxClass {
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 try{
                     Scanner scanner = instance.scanner;
-                    return scanner.nextLine();
+                    return new LoxString.LoxStringInstance(scanner.nextLine());
                 }catch (InputMismatchException e){
                     throw new RuntimeError(new Token(TokenType.IDENTIFIER, "readln", null, -1),
                         "failed to read with readline.");

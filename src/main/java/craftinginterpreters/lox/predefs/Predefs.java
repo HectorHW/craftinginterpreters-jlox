@@ -13,6 +13,8 @@ public class Predefs {
             case "FileIO" -> FileIO.getInstance();
             case "String" -> LoxString.getInstance();
             case "Number" -> LoxNumber.getInstance();
+            case "Boolean" -> LoxBoolean.getInstance();
+            case "Math" -> null;
             default -> throw new RuntimeError(new Token(TokenType.IDENTIFIER, name, null, -1), "unknown predefined object.");
         };
     }

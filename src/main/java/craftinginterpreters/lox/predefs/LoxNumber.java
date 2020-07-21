@@ -20,7 +20,11 @@ public class LoxNumber extends NativeLoxClass{
 
         @Override
         public String toString(){
-            return Double.toString(this.data);
+            String text = Double.toString(data);
+            if(text.endsWith(".0")){
+                text = text.substring(0, text.length()-2);
+            }
+            return text;
         }
 
         @Override
@@ -192,7 +196,7 @@ public class LoxNumber extends NativeLoxClass{
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return instance.data!=0.0 && !Double.isNaN(instance.data);
+                return LoxBoolean.LoxBooleanInstance.getInstance(instance.data!=0.0 && !Double.isNaN(instance.data));
             }
         });
 

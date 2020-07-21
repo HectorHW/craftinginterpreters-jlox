@@ -1,5 +1,7 @@
 package craftinginterpreters.lox;
 
+import craftinginterpreters.lox.predefs.LoxBoolean;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,7 +150,7 @@ public class Parser {
             condition = expression();
             consume(RIGHT_PAREN, "Expected `)` after while condition.");
         }else{
-            condition = new Expr.Literal(true);
+            condition = new Expr.Literal(LoxBoolean.TRUE);
         }
 
         //inLoop = true;
@@ -172,7 +174,7 @@ public class Parser {
         if(!check(SEMICOLON)){ //for(..;<cond>;
             condition = expression();
         }else{
-            condition = new Expr.Literal(true);
+            condition = new Expr.Literal(LoxBoolean.TRUE);
             //else for(..;;
         }
         consume(SEMICOLON, "Expected `;` after loop condition.");
@@ -432,8 +434,8 @@ public class Parser {
     }
 
     private Expr primary(){
-        if (match(FALSE)) return new Expr.Literal(false);
-        if (match(TRUE)) return new Expr.Literal(true);
+        if (match(FALSE)) return new Expr.Literal(LoxBoolean.FALSE);
+        if (match(TRUE)) return new Expr.Literal(LoxBoolean.TRUE);
         if (match(NIL)) return new Expr.Literal(null);
 
         if(match(THIS)) return new Expr.This(previous());

@@ -44,7 +44,7 @@ public class LoxString extends NativeLoxClass{
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return instance.data.length();
+                return new LoxNumber.LoxNumberInstance(0.0+instance.data.length());
             }
         });
 
@@ -68,7 +68,7 @@ public class LoxString extends NativeLoxClass{
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return instance.data;
+                return instance;
             }
         });
 
@@ -81,7 +81,8 @@ public class LoxString extends NativeLoxClass{
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
-                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)>0;
+                return LoxBoolean.LoxBooleanInstance.getInstance(
+                    instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)>0);
             }
         });
         instance.fields.put("l_", new NativeLoxFunction() {
@@ -93,7 +94,8 @@ public class LoxString extends NativeLoxClass{
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
-                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)<0;
+                return LoxBoolean.LoxBooleanInstance.getInstance(
+                    instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)<0);
             }
         });
         instance.fields.put("ge_", new NativeLoxFunction() {
@@ -105,7 +107,8 @@ public class LoxString extends NativeLoxClass{
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
-                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)>=0;
+                return LoxBoolean.LoxBooleanInstance.getInstance(
+                    instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)>=0);
             }
         });
         instance.fields.put("le_", new NativeLoxFunction() {
@@ -117,7 +120,8 @@ public class LoxString extends NativeLoxClass{
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
-                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)<=0;
+                return LoxBoolean.LoxBooleanInstance.getInstance(
+                    instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)<=0);
             }
         });
 
