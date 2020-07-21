@@ -82,6 +82,18 @@ public class LoxBoolean extends NativeLoxClass{
             }
         });
 
+        instance.fields.put("unarybang_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ZERO_ARGUMENTS;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return instance.value ? FALSE : TRUE;
+            }
+        });
+
     }
 
     @Override

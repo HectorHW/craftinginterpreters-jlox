@@ -1,6 +1,7 @@
 package craftinginterpreters.lox;
 
 import craftinginterpreters.lox.predefs.LoxBoolean;
+import craftinginterpreters.lox.predefs.LoxNumber;
 import craftinginterpreters.lox.predefs.NativeLoxFunction;
 import craftinginterpreters.lox.predefs.NativeLoxInstance;
 
@@ -202,6 +203,38 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     }
 
+    Object callSpecialMethod(LoxInstance object, String methodName, Expr.Unary expr){
+        Object f;
+        try{
+            f = object.get(new Token(TokenType.IDENTIFIER, methodName, null, expr.operator.line));
+        }catch (RuntimeError ignored){
+            throw new RuntimeError(expr.operator,
+                "failed to find special method "+methodName+" on left operand.");
+        }
+        if(f instanceof LoxFunction){
+            LoxFunction ff = (LoxFunction)f;
+            if(!ff.arity().equals(Collections.singleton(0))){
+                throw new RuntimeError(expr.operator,
+                    "wrong arity of special method "+methodName+" on left operand.");
+            }
+            return ff.call(this, Collections.emptyList(), expr.operator);
+        }
+        else if(f instanceof NativeLoxFunction){
+            NativeLoxFunction ff = (NativeLoxFunction)f;
+            if(!ff.arity().equals(Collections.singleton(0))){
+                throw new RuntimeError(expr.operator,
+                    "wrong arity of special method "+methodName+" on left operand.");
+            }
+            return ff.call(this, Collections.emptyList(), expr.operator);
+        }
+
+        else{
+            throw new RuntimeError(expr.operator,
+                methodName+" is not method");
+        }
+
+    }
+
 
 
     @Override
@@ -234,9 +267,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         Object right = evaluate(expr.right);
         switch(expr.operator.type){ //пока только минус, позже можно будет добавить ещё
             case MINUS:
+                if(right instanceof LoxInstance) return callSpecialMethod((LoxInstance) right, "unaryminus_", expr);
                 checkNumberOperand(expr.operator, right);
                 return -(double)right; //-double
-            case BANG: return !isTruthy(right); //!boolean
+            case BANG:
+                if(right instanceof LoxInstance) return callSpecialMethod((LoxInstance) right, "unarybang_", expr);
+
+                return !isTruthy(right); //!boolean
         }
         return null;
     }

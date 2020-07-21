@@ -14,7 +14,7 @@ public class Predefs {
             case "String" -> LoxString.getInstance();
             case "Number" -> LoxNumber.getInstance();
             case "Boolean" -> LoxBoolean.getInstance();
-            case "Math" -> null;
+            case "Math" -> LoxMath.getInstance();
             default -> throw new RuntimeError(new Token(TokenType.IDENTIFIER, name, null, -1), "unknown predefined object.");
         };
     }

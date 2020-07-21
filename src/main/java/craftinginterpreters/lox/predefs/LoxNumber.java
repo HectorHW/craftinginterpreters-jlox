@@ -200,6 +200,18 @@ public class LoxNumber extends NativeLoxClass{
             }
         });
 
+        instance.fields.put("unaryminus_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return ZERO_ARGUMENTS;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return new LoxNumberInstance(-instance.data);
+            }
+        });
+
 
     }
 

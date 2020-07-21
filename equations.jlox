@@ -1,14 +1,9 @@
 var io = import("predef.StdIO")();
 var pow = import("predef.Math").pow;
-print "введите коэффициенты квадратного уравнения";
+io.println("введите коэффициенты квадратного уравнения");
 var a = io.readnum();
 var b = io.readnum();
 var c = io.readnum();
-print a;
-print 0;
-//print type(0);
-print type(0)==type(a);
-print type(a);
 def binom(b, c){
 if(b==0){
         if(c==0){
