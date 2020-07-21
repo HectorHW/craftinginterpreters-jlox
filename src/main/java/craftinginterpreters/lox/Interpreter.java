@@ -183,7 +183,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 throw new RuntimeError(expr.operator,
                     "wrong arity of special method "+methodName+" on left operand.");
             }
-            return ff.call(this, Collections.singletonList(right));
+            return ff.call(this, Collections.singletonList(right), expr.operator);
         }
        else if(f instanceof NativeLoxFunction){
            NativeLoxFunction ff = (NativeLoxFunction)f;
@@ -191,7 +191,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                throw new RuntimeError(expr.operator,
                    "wrong arity of special method "+methodName+" on left operand.");
            }
-           return ff.call(this, Collections.singletonList(right));
+           return ff.call(this, Collections.singletonList(right), expr.operator);
        }
 
        else{

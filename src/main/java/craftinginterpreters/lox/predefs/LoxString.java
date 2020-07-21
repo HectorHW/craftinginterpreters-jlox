@@ -1,7 +1,6 @@
 package craftinginterpreters.lox.predefs;
 
-import craftinginterpreters.lox.Interpreter;
-import craftinginterpreters.lox.LoxClass;
+import craftinginterpreters.lox.*;
 
 import java.util.*;
 
@@ -70,6 +69,55 @@ public class LoxString extends NativeLoxClass{
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 return instance.data;
+            }
+        });
+
+        instance.fields.put("g_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
+                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)>0;
+            }
+        });
+        instance.fields.put("l_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
+                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)<0;
+            }
+        });
+        instance.fields.put("ge_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
+                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)>=0;
+            }
+        });
+        instance.fields.put("le_", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Predefs.requireType((LoxInstance) arguments.get(0), "expected String", classinstance);
+                return instance.data.compareTo(((LoxStringInstance)arguments.get(0)).data)<=0;
             }
         });
 

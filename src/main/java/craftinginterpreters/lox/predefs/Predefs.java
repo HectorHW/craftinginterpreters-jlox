@@ -16,4 +16,11 @@ public class Predefs {
     public static LoxInstance getObjectRefFromMethod(LoxFunction method){
         return (LoxInstance) method.closure.get("this");
     }
+
+    public static void requireType(LoxInstance object, String error, LoxClass... types){
+        for(var type : types){
+            if(object.getLoxClass().equals(type)) return;
+        }
+        throw new RuntimeError(new Token(TokenType.IDENTIFIER, "typing", null, -1), error);
+    }
 }
