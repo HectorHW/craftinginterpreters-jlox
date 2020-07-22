@@ -177,7 +177,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 "failed to find special method "+methodName+" on left operand.");
         }
        if(f instanceof LoxFunction){
-           System.out.println(1);
             LoxFunction ff = (LoxFunction)f;
             if(!ff.arity().equals(Collections.singleton(1))){
                 throw new RuntimeError(expr.operator,
@@ -257,7 +256,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Object visitCallExpr(Expr.Call expr) {
-        //System.out.println(expr.paren.line);
         Object callee = evaluate(expr.calee);
 
         List<Object> arguments = new ArrayList<>();
@@ -268,7 +266,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             throw new RuntimeError(expr.paren, "Can only call functions and classes.");
         }
         LoxCallable function = (LoxCallable) callee;
-        //System.out.println(function);
         if(!function.arity().contains(arguments.size()))
             {
             throw new RuntimeError(expr.paren,
@@ -281,7 +278,6 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Object visitAnonFunExpr(Expr.AnonFun expr) {
-        //LoxFunction function = new LoxFunction(stmt, environment);
         return new LoxFunction(new Stmt.Function(null, expr.params, expr.body, false), environment, false);
     }
 

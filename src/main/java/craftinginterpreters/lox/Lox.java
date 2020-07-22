@@ -91,7 +91,6 @@ public class Lox {
         checker.check(statements);
         if(hadError) return;
 
-        //System.out.println(new AstPrinter().print(expression));
         interpreter.interpret(statements);
 
     }
@@ -99,7 +98,6 @@ public class Lox {
     public static Environment runForEnvironment(String source){
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        //System.out.println(tokens);
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
@@ -118,7 +116,6 @@ public class Lox {
         checker.check(statements);
         if(hadError) throw new Resolver.ResolveError();
 
-        //System.out.println(new AstPrinter().print(expression));
         interpreter.interpret(statements);
         return interpreter.globals;
     }
@@ -126,7 +123,6 @@ public class Lox {
     private static void runAsREPLExpression(String source){
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        //System.out.println(tokens);
 
         Parser parser = new Parser(tokens);
         try{

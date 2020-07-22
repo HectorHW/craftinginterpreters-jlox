@@ -14,7 +14,6 @@ public abstract class NativeLoxClass extends LoxClass {
     }
     @Override
     public Object get(Token name){
-        //System.out.println(11);
         if(fields.containsKey(name.lexeme)) return fields.get(name.lexeme);
         var method = loxClass.findMethod(name.lexeme);
         if(method!=null) return method;
