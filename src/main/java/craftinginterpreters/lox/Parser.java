@@ -296,7 +296,7 @@ public class Parser {
             Token op1 = previous();
             Expr expr2 = expression();
             Token op2 = consume(COLON, "`:` expected for ternary operator.");
-            Expr expr3 = equality();
+            Expr expr3 = assignment();
             condition = new Expr.Ternary(
                 condition, op1, expr2, op2, expr3
             );

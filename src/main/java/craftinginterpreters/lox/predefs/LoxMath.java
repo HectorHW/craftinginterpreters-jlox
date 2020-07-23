@@ -34,6 +34,24 @@ public class LoxMath extends NativeLoxClass {
                     "argments must be numbers");
             }
         });
+
+        classInstance.fields.put("abs", new NativeLoxFunction() {
+            @Override
+            public Set<Integer> arity() {
+                return Collections.singleton(1);
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Object argument1 = arguments.get(0);
+
+                if(argument1 instanceof Double){
+                    return Math.abs((Double)argument1);
+                }
+                throw new RuntimeError(new Token(TokenType.IDENTIFIER, "pow", null, -1),
+                    "argments must be numbers");
+            }
+        });
     }
 
 
