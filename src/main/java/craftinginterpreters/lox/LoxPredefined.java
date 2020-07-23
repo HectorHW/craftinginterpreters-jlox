@@ -165,14 +165,19 @@ public class LoxPredefined {
         env.define("assert", new NativeLoxFunction() {
             @Override
             public Set<Integer> arity() {
-                return Collections.singleton(1);
+                return new HashSet<>(Arrays.asList(1,2));
             }
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Object argument = arguments.get(0);
-                if(!interpreter.isTruthy(argument)) throw new RuntimeError(new Token(TokenType.IDENTIFIER, "assert", null, -1),
-                    "assertion error.");
+                if(arguments.size()==1){
+                    if(!interpreter.isTruthy(argument)) throw new RuntimeError(new Token(TokenType.IDENTIFIER, "assert", null, -1),
+                        "assertion error.");
+                }else{
+                    if(!interpreter.isTruthy(argument)) throw new RuntimeError(new Token(TokenType.IDENTIFIER, "assert", null, -1),
+                        Interpreter.stringify(arguments.get(1)));
+                }
                 return argument;
             }
         });
