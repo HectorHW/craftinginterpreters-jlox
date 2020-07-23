@@ -1,0 +1,43 @@
+var pow = import("predef.Math").pow;
+var abs = import("predef.Math").abs;
+var f = def(x){
+    return -3*pow(x, 3) + 2*pow(x,2) - 8*x + 5;
+};
+
+def solve(F, point_a, point_b, eps){
+    if(F(point_a)*F(point_b)>0){
+        print "точки находятся по одну сторону от оси OX, метод неприменим";
+        return;
+    }
+
+    if(F(point_a)==0){
+        print "решение: "+point_a;
+        return;
+    }
+    if(F(point_b)==0){
+            print "решение: "+point_b;
+            return;
+    }
+    var median_x;
+    var median_y;
+    while{
+        median_x = (point_a + point_b)/2;
+        median_y = F(median_x);
+
+        if(abs(median_y)<=eps){
+            break;
+        }
+
+        if(F(point_a)>0){
+            median_y>0 ? point_a=median_x : point_b=median_x;
+        }else{
+            median_y>0 ? point_b=median_x : point_a=median_x;
+        }
+        print median_y;
+    }
+
+    print "решение: "+median_x + " { F(X) = "+F(median_x)+" }";
+
+}
+
+solve(f, -5, 5, 0.000001);
